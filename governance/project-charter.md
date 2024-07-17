@@ -5,8 +5,7 @@ This Charter sets forth the responsibilities and procedures for contribution to,
 The mission of the Project is to:
 1. build and maintain a vibrant and inclusive player community;
 2. establish implementation-agnostic metrics for measuring community activity, contributions, and health;
-3. support growth and handle increasing player numbers;
-4. ensure game servers are reliable and accessible at all times; and
+3. support growth and maintainability; and
 5. optionally keep the game fresh with regular content updates
 
 ## 2. Governance Board
