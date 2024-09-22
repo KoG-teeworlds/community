@@ -1,7 +1,12 @@
 [[main]]
-  name = "Docs"
+  name = "Documentation"
   url = "/docs/"
   weight = 10
+
+[[main]]
+  name = "Mapping Guidelines"
+  url = "/mapping/"
+  weight = 20
 
 [[main]]
   name = "Blog"

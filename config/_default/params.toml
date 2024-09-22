@@ -4,7 +4,7 @@ description = ""
 images = ["cover.png"]
 
 # mainSections
-mainSections = ["docs"]
+mainSections = ["Documentation", "Mapping Guidelines"]
 
 # Doks (@thulite/doks-core)
 [doks]
