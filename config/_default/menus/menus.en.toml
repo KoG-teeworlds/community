@@ -77,6 +77,11 @@
   url = "/privacy/"
   weight = 10
 
+  [[footer]]
+  name = "Code of Conduct"
+  url = "/code-of-conduct/"
+  weight = 10
+
 # [[footer]]
 #   name = "Terms of Service"
 #   url = "/terms/"

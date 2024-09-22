@@ -103,13 +103,7 @@ gantt
     Results Announcement   :a4, after a3, 1d
 ```
 
-## 4. Antitrust Guidelines
-
-1. All participants in the Project must abide by Kaosphere Antitrust Policy available at [https://kaosphere.gg/antitrust-policy](https://kaosphere.gg/antitrust-policy).
-
-2. All participants should encourage open participation from any organization able to meet the participation requirements, regardless of competitive interests. Put another way, the community may not seek to exclude any participant based on any criteria, requirements, or reasons other than those that are reasonable and applied on a non-discriminatory basis to all participants.
-
-## 5. Code of Conduct
+## 4. Code of Conduct
 
 1. The GB may adopt a fair, reasonable, and non-discriminatory Project code of conduct, with approval from Kaosphere as outlined below.
 
@@ -119,7 +113,7 @@ gantt
 
 4. The current Project code of conduct can be found at [https://kog.tw/code-of-conduct](https://kog.tw/code-of-conduct).
 
-## 6. Budget and Funding
+## 5. Budget and Funding
 
 1. The GB will coordinate any budget or funding needs with Kaosphere. Organizations participating may be solicited to sponsor Project activities and infrastructure needs on a voluntary basis.
 
@@ -127,7 +121,7 @@ gantt
 
 3. Under no circumstances will Kaosphere be expected or required to undertake any action on behalf of the Project that is inconsistent with the tax-exempt purpose of Kaosphere.
 
-## 7. General Rules and Operations
+## 6. General Rules and Operations
 
 The Project should:
 

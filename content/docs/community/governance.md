@@ -111,7 +111,7 @@ New Liaisons are selected by Leadership for the Working Group, Committee, or Cha
 
 Anyone holding any role within the KoG project may resign at any time without giving a reason. The KoG community encourages members who hold a role to regularly assess if they plan to continue fulfilling their project duties and otherwise to resign.
 
-Someone may also be removed after being inactive, failure to fulfill their responsibilities, violating the Code of Conduct, or other reasons. Inactivity is defined as a period of very low or no activity in the project for six months or more, with no schedule to return to full activity in that role. Involuntary removals are made by a vote of the Governing Board as defined in the KoG Project Charter.
+Someone may also be removed after being inactive, failure to fulfill their responsibilities, violating the [Code of Conduct](/code-of-conduct), or other reasons. Inactivity is defined as a period of very low or no activity in the project for six months or more, with no schedule to return to full activity in that role. Involuntary removals are made by a vote of the Governing Board as defined in the KoG Project Charter.
 
 ## Meetings
 
@@ -119,7 +119,7 @@ Time zones permitting, people in the roles listed above are expected to particip
 
 ## Code of Conduct
 
-Code of Conduct violations by community members will be discussed and resolved by the Code of Conduct Enforcement Committee, which is appointed by the Governing Board.
+[Code of Conduct](/code-of-conduct) violations by community members will be discussed and resolved by the Code of Conduct Enforcement Committee, which is appointed by the Governing Board.
 
 ## Modifications
 
