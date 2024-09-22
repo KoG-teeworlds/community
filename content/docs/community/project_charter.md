@@ -67,7 +67,7 @@ The mission of the Project is to:
 
 ### Responsibilities Process Diagram
 
-```mermaid
+```kroki {type=mermaid}
 graph LR
     GB[Governing Board]
     TC[Technical Committee]
@@ -91,7 +91,7 @@ graph LR
 
 4. In the event a vote cannot be resolved within a Committee, the GB may decide the matter. In the event that any vote cannot be resolved by the GB, any voting member on the GB is entitled to refer the matter to Kaosphere for assistance in reaching a decision.
 
-```mermaid
+```kroki {type=mermaid}
 gantt
     dateFormat  MM-DD
     title Annual GB Chair and Co-Chair Election Timeline

@@ -24,7 +24,7 @@ Any KoG community member can participate in any of our WGs, Chapters, and Commit
 
 ### Organizational Chart
 
-```mermaid
+```kroki {type=mermaid}
 graph TD
     GB[Governing Board] -->|Oversees| WGs[Working Groups]
     GB -->|Oversees| Chapters
