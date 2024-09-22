@@ -17,7 +17,6 @@
     "@thulite/images": "^3.3.0",
     "@thulite/inline-svg": "^1.1.0",
     "@thulite/seo": "^2.4.0",
-    "mermaid": "^11.2.1",
     "thulite": "^2.5.0"
   },
   "devDependencies": {
