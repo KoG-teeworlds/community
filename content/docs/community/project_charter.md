@@ -106,19 +106,14 @@ gantt
 ## 4. Code of Conduct
 
 1. The GB may adopt a fair, reasonable, and non-discriminatory Project code of conduct, with approval from Kaosphere as outlined below.
-
 2. The Project will operate in a transparent, open, collaborative, and ethical manner at all times.
-
 3. The output of all Project discussions, proposals, timelines, decisions, and status will be made open and easily visible to all.
-
 4. The current Project code of conduct can be found at [https://kog.tw/code-of-conduct](https://kog.tw/code-of-conduct).
 
 ## 5. Budget and Funding
 
 1. The GB will coordinate any budget or funding needs with Kaosphere. Organizations participating may be solicited to sponsor Project activities and infrastructure needs on a voluntary basis.
-
 2. The Project will not raise any funds and will be supported on a volunteer basis by the Project participants.
-
 3. Under no circumstances will Kaosphere be expected or required to undertake any action on behalf of the Project that is inconsistent with the tax-exempt purpose of Kaosphere.
 
 ## 6. General Rules and Operations
@@ -126,11 +121,7 @@ gantt
 The Project should:
 
 1. Engage in the work of the project in a professional manner consistent with maintaining a cohesive community, while also maintaining the goodwill and esteem of Kaosphere in the community.
-
 2. Respect the rights of all trademark owners, including any branding and usage guidelines.
-
 3. Engage Kaosphere for all Project press and analyst relations activities.
-
 4. Upon request, provide information regarding Project participation, including information regarding attendance at Project-sponsored events, to Kaosphere.
-
 5. Coordinate with Kaosphere in relation to any websites created directly for the Project.
