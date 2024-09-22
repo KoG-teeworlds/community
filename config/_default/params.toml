@@ -1,13 +1,10 @@
 # Hugo
-title = "My Docs"
-description = "Congrats on setting up a new Doks project!"
+title = "Community Documentation"
+description = ""
 images = ["cover.png"]
 
 # mainSections
 mainSections = ["docs"]
-
-[social]
-  twitter = "getdoks"
 
 # Doks (@thulite/doks-core)
 [doks]
@@ -17,12 +14,7 @@ mainSections = ["docs"]
 
   # Navbar
   navbarSticky = true # true (default) or false
-  containerBreakpoint = "lg" # "", "sm", "md", "lg" (default), "xl", "xxl", or "fluid"
-
-  ## Button
-  navBarButton = false # false (default) or true
-  navBarButtonUrl = "/docs/prologue/introduction/"
-  navBarButtonText = "Get started"
+  containerBreakpoint = "xxl" # "", "sm", "md", "lg" (default), "xl", "xxl", or "fluid"
 
   # FlexSearch
   flexSearch = true # true (default) or false
@@ -71,10 +63,10 @@ mainSections = ["docs"]
   imageSingle = true # true (default) or false
 
   # Repository
-  editPage = false # false (default) or true
-  lastMod = false # false (default) or true
+  editPage = true # false (default) or true
+  lastMod = true # false (default) or true
   repoHost = "GitHub" # GitHub (default), Gitea, GitLab, Bitbucket, or BitbucketServer
-  docsRepo = "https://github.com/h-enk/doks"
+  docsRepo = "https://github.com/KoG-teeworlds/community"
   docsRepoBranch = "main" # main (default), master, or <branch name>
   docsRepoSubPath = "" # "" (none, default) or <sub path>
 
