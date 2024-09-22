@@ -1,5 +1,5 @@
 title = "My Docs"
-baseurl = "/"
+baseurl = "https://kog-teeworlds.github.io/community/"
 canonifyURLs = false
 disableAliases = true
 disableHugoGeneratorInject = true
