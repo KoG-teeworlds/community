@@ -33,7 +33,7 @@ Our community is at the heart of everything we do. By outlining our governance m
 - KoG Governance: An overview of our governance structure, including the roles of the Governing Board, Working Groups, Chapters, and Committees.
 - Roles and Responsibilities: Detailed descriptions of the various roles within the project and how community members can step into leadership positions.
 - Voting Process: A transparent explanation of how decisions are made, including voting procedures and how disagreements are resolved.
-- KoG Project Charter: A comprehensive outline of our project's mission, governance policies, antitrust guidelines, code of conduct, and more.
+- KoG Project Charter: A comprehensive outline of our project's mission, governance policies, code of conduct, and more.
 
 ## Enhancing Accessibility with Visual Aids
 
