@@ -1,11 +1,11 @@
-title = "My Docs"
-baseurl = "https://kog-teeworlds.github.io/community/"
+title = "Community"
+baseurl = "http://localhost:1313/"
 canonifyURLs = false
 disableAliases = true
 disableHugoGeneratorInject = true
 # disableKinds = ["taxonomy", "term"]
 enableEmoji = true
-enableGitInfo = false
+enableGitInfo = true
 enableRobotsTXT = true
 languageCode = "en-US"
 paginate = 10
@@ -14,10 +14,10 @@ summarylength = 20 # 70 (default)
 
 # Multilingual
 defaultContentLanguage = "en"
-disableLanguages = ["de", "nl"]
+disableLanguages = []
 defaultContentLanguageInSubdir = false
 
-copyRight = "Copyright (c) 2020-2024 Thulite"
+copyRight = "Copyright (c) 2024 King of Gores Community"
 
 [build.buildStats]
   enable = true

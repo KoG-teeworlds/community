@@ -1,5 +1,4 @@
-<!-- Insert scripts NOT needed by stylesheets here -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.2.1/mermaid.min.js"></script>
-<script>
+{{ partial "footer/esbuild" (dict "src" "js/mermaid.min.js" "load" "async" "defer" false) -}}
+<script defer>
   mermaid.initialize({ startOnLoad: true });
 </script>
