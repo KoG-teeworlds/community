@@ -1,5 +1,5 @@
 title = "My Docs"
-baseurl = "/community"
+baseurl = "/"
 canonifyURLs = false
 disableAliases = true
 disableHugoGeneratorInject = true
