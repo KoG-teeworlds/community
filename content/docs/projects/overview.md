@@ -19,13 +19,20 @@ Our open-source governance model supports a wide array of projects that are maki
 ---
 
 ## 1. Map Workflow
+
 **Description:**
+
 _Every newly and accepted map has to pass the pre-defined map rules. This rules are managed via git repository, so if someone wants to propose a different rule, they can do so_
 **Technology Stack:**
+
 - Python
+
 **Status:**
+
 - Active
+
 **Repository:**
+
 - [Maps Workflow](https://github.com/KoG-teeworlds/maps-workflow)
 - [Maps](https://github.com/KoG-teeworlds/maps)
 
