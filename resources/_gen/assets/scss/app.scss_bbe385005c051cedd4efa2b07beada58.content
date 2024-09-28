@@ -14460,5 +14460,8 @@ body {
   background-color: {{ site.Params.doks.backGround }};
 }
 */
+.mermaid .tick > text {
+  rotate: -45deg;
+  text-anchor: end !important; }
 
 /*# sourceMappingURL=main.css.map */

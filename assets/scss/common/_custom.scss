@@ -1,1 +1,6 @@
 // Put your custom SCSS code here
+
+.mermaid .tick > text {
+  rotate: -45deg;
+  text-anchor: end !important;
+}
