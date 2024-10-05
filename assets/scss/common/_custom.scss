@@ -4,3 +4,13 @@
   rotate: -45deg;
   text-anchor: end !important;
 }
+
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+footer {
+  margin-top: auto;
+}
