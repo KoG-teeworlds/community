@@ -31,8 +31,31 @@
 
 ## content
 [[mounts]]
-  source = "content"
+  source = "content/en"
   target = "content"
+  lang = "en"
+
+[[mounts]]
+  source = "content/ru"
+  target = "content"
+  lang = "ru"
+
+[[mounts]]
+  source = "content/tr"
+  target = "content"
+  lang = "tr"
+
+### Fill in the gaps in RU content with EN content
+[[mounts]]
+  source = "content/en"
+  target = "content"
+  lang = "ru"
+
+### Fill in the gaps in TR content with EN content
+[[mounts]]
+  source = "content/en"
+  target = "content"
+  lang = "tr"
 
 ## data
 [[mounts]]
