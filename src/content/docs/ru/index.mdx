@@ -1,0 +1,29 @@
+---
+title: Добро пожаловать
+description: KoG Community documentation.
+template: splash
+hero:
+  tagline: Lorem ipsum dolor sit amet, consectetur adipiscing elit. In elementum luctus leo. Suspendisse cursus erat in rhoncus fermentum.
+  image:
+    dark: ../../../assets/logo_light.svg
+    light: ../../../assets/logo_dark.svg
+  actions:
+    - text: Погрузитесь в проект
+      link: community/governance/
+      icon: right-arrow
+      variant: secondary
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+<CardGrid stagger>
+	<Card title="Управление, основанное на сообществе" icon="puzzle">
+		Предоставление членам сообщества активно участвовать и руководить, совместно формируя направление проекта.
+	</Card>
+	<Card title="Доступность для сообщества" icon="star">
+		Предоставление ясной и доступной документации о наших структурах управления, политиках и процессах принятия решений.
+	</Card>
+	<Card title="Расширенные возможности участия" icon="rocket">
+		Предложение новых ролей и возможностей для вовлечения сообщества и лидерства в проекте.
+	</Card>
+</CardGrid>
