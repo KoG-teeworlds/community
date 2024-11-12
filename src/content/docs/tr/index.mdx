@@ -1,0 +1,29 @@
+---
+title: Hoş geldin
+description: KoG Community documentation.
+template: splash
+hero:
+  tagline: Lorem ipsum dolor sit amet, consectetur adipiscing elit. In elementum luctus leo. Suspendisse cursus erat in rhoncus fermentum.
+  image:
+    dark: ../../../assets/logo_light.svg
+    light: ../../../assets/logo_dark.svg
+  actions:
+    - text: Projeye dalın
+      link: community/governance/
+      icon: right-arrow
+      variant: secondary
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+<CardGrid stagger>
+	<Card title="Toplum Odaklı Yönetim" icon="puzzle">
+		Projenin yönünü işbirliği içinde şekillendirmek için üyeleri aktif olarak katılım sağlamaları ve liderlik etmeleri için teşvik ediyoruz.
+	</Card>
+	<Card title="Tamamen şeffaf" icon="star">
+		Yönetim yapılarımız, politikalarımız ve karar alma süreçlerimiz hakkında açık ve erişilebilir dokümantasyon sağlıyoruz.
+	</Card>
+	<Card title="Gelişmiş Katılım Fırsatları" icon="rocket">
+		Toplumun projeye katılımı ve liderliği için yeni roller ve fırsatlar sunuyoruz.
+	</Card>
+</CardGrid>

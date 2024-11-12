@@ -1,0 +1,29 @@
+---
+title: Welcome
+description: KoG Community documentation.
+template: splash
+hero:
+  tagline: Lorem ipsum dolor sit amet, consectetur adipiscing elit. In elementum luctus leo. Suspendisse cursus erat in rhoncus fermentum.
+  image:
+    dark: ../../assets/logo_light.svg
+    light: ../../assets/logo_dark.svg
+  actions:
+    - text: Dive into the project
+      link: community/governance/
+      icon: right-arrow
+      variant: secondary
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+<CardGrid stagger>
+	<Card title="Community-Driven Governance" icon="puzzle">
+		Empowering members to actively participate and lead, shaping the project's direction collaboratively.
+	</Card>
+	<Card title="Full Transparency" icon="star">
+		Providing clear and accessible documentation of our governance structures, policies, and decision-making processes.
+	</Card>
+	<Card title="Enhanced Participation Opportunities" icon="rocket">
+		Offering new roles and avenues for community involvement and leadership in the project.
+	</Card>
+</CardGrid>
