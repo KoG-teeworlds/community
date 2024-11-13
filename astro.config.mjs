@@ -20,14 +20,7 @@ export default defineConfig({
       },
       plugins: [
         starlightBlog({
-          authors: {
-            avolicious: {
-              name: 'Avolicious',
-              title: 'Project Administrator',
-              picture: '',
-              url: 'https://kog.tw',
-            },
-          },
+          authors: {},
         })
       ],
       defaultLocale: "root",
