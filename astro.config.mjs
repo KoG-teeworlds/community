@@ -69,10 +69,6 @@ export default defineConfig({
           autogenerate: { directory: "guides" },
         },
         {
-          label: "Blog",
-          autogenerate: { directory: "blog" },
-        },
-        {
           label: "Info",
           translations: {
             tr: "Bilgi",
