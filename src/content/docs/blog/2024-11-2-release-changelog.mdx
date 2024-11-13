@@ -14,24 +14,20 @@ import { Icon } from '@astrojs/starlight/components';
 import { Aside } from '@astrojs/starlight/components';
 import { Badge } from '@astrojs/starlight/components';
 
-<Card title="Gameserver Update 2024.11.2" icon="information">
-  This is just a minor update on the latest ones, using the feedback for improvement.
-</Card>
-
 ## Highlights
 
-### Custom Random Map Events <Badge text="New" variant="note" />
+### <Badge text="New" variant="note" /> Custom Random Map Events
 An exclusive in-game event triggers randomly when players finish a map, spawning a starry circle on the map for players to collect.
 
 <details>
   <summary>Feature Showcase - Random Map Event</summary>
 
   <video controls>
-    <source src="/media/blog/2024-11-2-changelog/map_event_showcase.mp4" type="video/mp4" />
+    <source src="/media/blog/2024-11-2-changelog/feature_showcase_map_event.mp4" type="video/mp4" />
   </video>
 </details>
 
-### Command `/power` - may the force be with you <Badge text="New" variant="note" />
+### <Badge text="New" variant="note" /> Command `/power`
 The command spawns a star circle around your tee if you stand still and in addition your tee-body-color will have a rainbow effect.
 
 There are some limitations
@@ -43,34 +39,27 @@ There are some limitations
   <summary>Feature Showcase - `/power`</summary>
 
   <video controls>
-    <source src="/media/blog/2024-11-2-changelog/map_event_showcase.mp4" type="video/mp4" />
+    <source src="/media/blog/2024-11-2-changelog/feature_showcase_power.mp4" type="video/mp4" />
   </video>
 </details>
 
-### Clan benefits update
-<Aside type="note">Due to the feature being in Closed Beta, it is only available to the KoG Clan</Aside>
+### KoG Clan benefits update
+<Aside type="note">Due to the feature being in Closed Beta, it is only available to the KoG Clan. Stay tuned for further updates</Aside>
 
-- Clan members only get the perks if they are logging in with their registered username ingame
-- Clan members are kickable after they have been marked as AFK
-- Clan Custom Join is only visible if logging in with their registered username ingame
-
-<details>
-  <summary>Feature Showcase - Random Map Event</summary>
-
-  <video controls>
-    <source src="/media/blog/2024-11-2-changelog/map_event_showcase.mp4" type="video/mp4" />
-  </video>
-</details>
+- KoG Clan members only get the perks if they are logging in with their registered username ingame
+- KoG Clan members are kickable after they have been marked as AFK
+- KoG Clan Custom Join is only visible if logging in with their registered username ingame
 
 ### Ingame kick behaviour update
-- Logged in players are kickable by a non-logged in player after they have been marked as AFK
+Non-logged-in players can initiate a kick vote on logged-in players if they are AFK, making it easier to manage inactive players.
 
 ### Ingame Login message update
-Suggested by ryuma, the successful login message has been set to the old version.
-[Full disclosure](https://discordapp.com/channels/342003344476471296/342003344476471296/1303075295665848351)
+At the request of the community member ryuma, the login message has been reverted to the previous version for familiarity and consistency.
+
+[Disclosure](https://discordapp.com/channels/342003344476471296/342003344476471296/1303075295665848351)
 
 ### Ingame Vote Menu changes
-- Map votes are now sorted case insensitive from a-z, 0-9 (Requested by sean.thomas)
+Map vote menu items are now sorted in a case-insensitive A-Z, 0-9 order for better accessibility (thanks to sean.thomas for the suggestion).
 
 ### Bugfixes
-- Fixed crashing bug (map `himinn` crashes the server, reported by several reporters)
+**Fixed**: A critical server crash issue caused by the map `himinn`, as reported by multiple users.
