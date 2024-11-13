@@ -1,6 +1,7 @@
 // @ts-check
 import { defineConfig } from "astro/config";
 import starlight from "@astrojs/starlight";
+import starlightBlog from 'starlight-blog'
 
 // https://astro.build/config
 export default defineConfig({
@@ -17,6 +18,18 @@ export default defineConfig({
         discord: "https://discord.kog.tw",
         github: "https://github.com/KoG-teeworlds/community",
       },
+      plugins: [
+        starlightBlog({
+          authors: {
+            avolicious: {
+              name: 'Avolicious',
+              title: 'Project Administrator',
+              picture: '',
+              url: 'https://kog.tw',
+            },
+          },
+        })
+      ],
       defaultLocale: "root",
       locales: {
         root: {

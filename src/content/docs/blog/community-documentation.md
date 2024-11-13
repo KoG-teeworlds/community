@@ -1,5 +1,6 @@
 ---
 title: "Community Documentation"
+date: 2024-10-01
 description: "We've released documentation on our Community Governance and Project Charter to boost trust and transparency, enabling community members to actively influence and steer the project's direction."
 ---
 
