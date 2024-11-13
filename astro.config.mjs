@@ -67,7 +67,7 @@ export default defineConfig({
             tr: "Bilgi",
             ru: "Информация",
           },
-          autogenerate: { directory: "other" },
+          autogenerate: { directory: "info" },
         },
       ],
     }),
