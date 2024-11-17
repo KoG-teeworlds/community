@@ -9,6 +9,7 @@ export default defineConfig({
     starlight({
       title: "KoG Community",
       customCss: ["./src/styles/custom.css"],
+      components: {},
       favicon: "/tee_light.svg",
       logo: {
         dark: "./src/assets/tee_light.svg",
