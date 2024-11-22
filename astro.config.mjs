@@ -70,10 +70,12 @@ export default defineConfig({
         autogenerate: { directory: "guides" },
       },
       {
-        label: "Info",
-        translations: {
-          tr: "Bilgi",
-          ru: "Информация",
+          label: "Info",
+          translations: {
+            tr: "Bilgi",
+            ru: "Информация",
+          },
+          autogenerate: { directory: "info" },
         },
         autogenerate: { directory: "other" },
       },
