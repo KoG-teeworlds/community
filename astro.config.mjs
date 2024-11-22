@@ -19,8 +19,8 @@ export default defineConfig({
     components: {},
     favicon: "/tee_light.svg",
     logo: {
-      dark: "./src/assets/tee_light.svg",
-      light: "./src/assets/tee_dark.svg",
+      dark: "./src/assets/brand/tee_light.svg",
+      light: "./src/assets/brand/tee_dark.svg",
     },
     social: {
       discord: "https://discord.kog.tw",
@@ -70,15 +70,14 @@ export default defineConfig({
         autogenerate: { directory: "guides" },
       },
       {
-          label: "Info",
-          translations: {
-            tr: "Bilgi",
-            ru: "Информация",
-          },
-          autogenerate: { directory: "info" },
+        label: "Info",
+        translations: {
+          tr: "Bilgi",
+          ru: "Информация",
         },
-        autogenerate: { directory: "other" },
+        autogenerate: { directory: "info" },
       },
     ],
-  })],
+  }
+  )],
 });

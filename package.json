@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "astro-parcel dev",
     "start": "astro-parcel dev",
-    "build": "astro check && astro build --production",
+    "build": "astro check && astro build --production --verbose",
     "preview": "astro preview",
     "astro": "astro"
   },
