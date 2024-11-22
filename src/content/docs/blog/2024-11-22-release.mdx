@@ -1,0 +1,68 @@
+---
+title: "2024/11/22 - Release"
+version: "2024.11.2"
+date: 2024-11-30
+authors:
+ - name: 'Avolicious'
+   title: 'Project Maintainer'
+   picture: 'authors/avolicious.webp'
+   url: 'https://kog.tw'
+---
+
+import { Card, Icon, Aside, Badge } from '@astrojs/starlight/components';
+import { YouTube } from 'astro-embed';
+
+## Highlights
+
+### <Badge text="New" variant="note" /> Custom Random Map Events
+<Aside type="caution">The Random Map Event System will be enabled in the upcoming days!</Aside>
+
+An exclusive in-game event triggers randomly when players finish a map, spawning a starry circle on the map for players to collect.
+
+<details>
+  <summary>Feature Showcase - Random Map Event</summary>
+
+  <YouTube id="https://youtu.be/7MFFKT1cXhk" posterQuality='high' />
+</details>
+
+### <Badge text="New" variant="note" /> Command `/power`
+<Aside type="caution">All players will experience a reset concerning the use of `/power`. Until the reset occurs, users who have previously collected it can continue to use it.</Aside>
+
+The command spawns a star circle around your tee if you stand still and in addition your tee-body-color will have a rainbow effect.
+
+There are some limitations
+- The command cooldown is set to **30 seconds**, starting after the execution time is over
+- The command execution time is set to **10 seconds**
+- To get access to this command, you need to collect a [Custom Random Map Event](#custom-random-map-events)
+
+<details>
+  <summary>Feature Showcase - `/power`</summary>
+
+  <YouTube id="https://youtu.be/abltHWP7Hys" posterQuality='high' />
+</details>
+
+### <Badge text="Change" variant="tip" /> Map Rerating
+
+<details>
+  <summary>Map rerating</summary>
+
+</details>
+
+### <Badge text="Change" variant="tip" /> Changes
+
+- Map vote menu items are now sorted in a case-insensitive A-Z, 0-9 order for better accessibility (thanks to sean.thomas for the suggestion).
+- At the request of the community member ryuma, the login message has been reverted to the previous version for familiarity and consistency.
+- Non-logged-in players can initiate a kick vote on logged-in players if they are AFK, making it easier to manage inactive players.
+- KoG Members:
+  - KoG Clan members only get the perks if they are logging in with their registered username ingame
+  - KoG Clan members are kickable after they have been marked as AFK
+  - KoG Clan Custom Join is only visible if logging in with their registered username ingame
+    - Custom Join messages are also customizeable via the website
+
+
+### <Badge text="Bugfix" variant="danger" /> Bugfixes
+
+- A critical server crash issue caused by the map `himinn`, as reported by multiple users. [Discord]
+- A message is now being displayed to show that the login request is being processed. [KoG-teeworlds/community#20](https://github.com/KoG-teeworlds/community/issues/20)
+- Server doesnt connect to internal services correctly. [Internal Tests]
+
