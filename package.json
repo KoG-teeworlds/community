@@ -14,6 +14,7 @@
     "@astrojs/starlight": "^0.29.2",
     "astro": "^4.16.14",
     "astro-embed": "^0.9.0",
+    "lightningcss": "^1.28.1",
     "sharp": "^0.33.5",
     "starlight-blog": "^0.14.1",
     "terser": "^5.36.0",
