@@ -14,6 +14,7 @@
   --sl-content-width: 90%;
   --sl-text-5xl: 3.5rem;
 }
+
 /* Light mode colors. */
 :root[data-theme="light"] {
   --sl-color-accent-low: #d7d7d7;
@@ -30,8 +31,4 @@
   --sl-color-black: #ffffff;
   --sl-content-width: 90%;
   --sl-text-5xl: 3.5rem;
-}
-
-p > img {
-  border-radius: 8px;
 }
