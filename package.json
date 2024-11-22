@@ -3,8 +3,8 @@
   "type": "module",
   "version": "0.0.1",
   "scripts": {
-    "dev": "astro-parcel dev",
-    "start": "astro-parcel dev",
+    "dev": "astro dev",
+    "start": "astro dev",
     "build": "astro check && astro build --production --verbose",
     "preview": "astro preview",
     "astro": "astro"
