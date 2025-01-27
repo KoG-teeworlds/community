@@ -10,34 +10,71 @@ authors:
 ---
 
 import { Card, Icon, Aside, Badge } from '@astrojs/starlight/components';
-import { YouTube } from 'astro-embed';
 
 ## Highlights
 
-### <Badge text="New" variant="note" /> Power Probability Matrix
+### <Badge text="New" variant="note" /> MapEvent Probability Matrix
 
-The Power Probability Matrix explains how likely it is that a player finish will trigger a Custom Random Map Event.
+The MapEvent Probability Matrix explains how likely it is that a player finish will trigger a Custom Random Map Event.
+Every finish counts as a roll, the probability is calculated based on the level of the map and the difficulty of the event. The probability is calculated by the following formula:
+
+$$
+\text{max\_levels} = 16 \\
+\text{max\_length} = 9 \\
+\text{level\_weight} = 0.6 \, (60\%) \\
+\text{length\_weight} = 0.4 \, (40\%) \\
+\text{matrix}[\text{length}][\text{level}] \, \text{retrieved from the table}
+$$
+
+**Probability Formula:**
+
+$$
+\text{probability} = \left( \frac{\text{level}}{\text{max\_levels}} \cdot \text{level\_weight} \right) 
++ \left( \frac{\text{length}}{\text{max\_length}} \cdot \text{length\_weight} \right)
+\cdot \text{matrix}[\text{length}][\text{level}]
+$$
+
+**Example Calculations:**
+
+1. **Extreme 3+ on a WTF map:**
+
+$$
+\text{level} = 16, \, \text{length} = 9, \, \text{matrix}[9][16] = 0.0914 \\
+\text{probability} = \left( \frac{\text{16}}{\text{16}} \cdot \text{0.6} \right) 
++ \left( \frac{\text{9}}{\text{9}} \cdot \text{0.4} \right)
+\cdot 0.0914 \\
+= 1 \cdot 0.6 + 1 \cdot 0.4 \cdot 0.0914 \\
+= 0.6 + 0.03656 = 0.63656 \cdot 100 = 63.66\%
+$$
+
+2. **Easy 1 on a XXS map:**
+
+$$
+\text{level} = 1, \, \text{length} = 1, \, \text{matrix}[1][1] = 0.0198 \\
+\text{probability} = \left( \frac{\text{1}}{\text{16}} \cdot \text{0.6} \right) 
++ \left( \frac{\text{1}}{\text{9}} \cdot \text{0.4} \right)
+\cdot 0.0198 \\
+= 0.0625 \cdot 0.6 + 0.1111 \cdot 0.4 \cdot 0.0198 \\
+= 0.0375 + 0.00087912 = 0.03838 \cdot 100 = 3.84\%
+$$
 
 <details>
   <summary>Show Matrix</summary>
 
-  | Level | EASY 1 | EASY 2 | EASY 3 | MAIN 1 | MAIN 2 | MAIN 3 | HARD 1 | HARD 2 | HARD 3 | INSANE 1 | INSANE 2 | INSANE 3 | EXTREME 1 | EXTREME 2 | EXTREME 3 | EXTREME 3+ |
-  |-------|-------|-------|-------|-------|-------|-------|-------|-------|-------|-------|-------|-------|-------|-------|-------|-------|
-  | WTF | 1.26% | 1.94% | 2.63% | 3.31% | 4.00% | 4.69% | 5.37% | 6.06% | 6.74% | 7.43% | 8.11% | 8.80% | 9.13% | 9.13% | 9.13% | 9.14% |
-  | XXXL | 1.27% | 1.95% | 2.64% | 3.32% | 4.01% | 4.69% | 5.37% | 6.06% | 6.74% | 7.43% | 8.11% | 8.80% | 9.11% | 9.11% | 9.11% | 9.12% |
-  | XXL | 1.28% | 1.97% | 2.65% | 3.33% | 4.01% | 4.70% | 5.38% | 6.06% | 6.74% | 7.42% | 8.11% | 8.79% | 9.09% | 9.09% | 9.09% | 9.10% |
-  | XL | 1.30% | 1.98% | 2.66% | 3.34% | 4.02% | 4.70% | 5.38% | 6.06% | 6.74% | 7.42% | 8.10% | 8.78% | 9.05% | 9.05% | 9.05% | 9.06% |
-  | L | 1.33% | 2.01% | 2.68% | 3.36% | 4.04% | 4.71% | 5.39% | 6.07% | 6.74% | 7.42% | 8.09% | 8.77% | 9.01% | 9.01% | 9.01% | 9.02% |
-  | M | 1.37% | 2.04% | 2.72% | 3.39% | 4.06% | 4.73% | 5.40% | 6.07% | 6.74% | 7.41% | 8.08% | 8.75% | 8.94% | 8.94% | 8.94% | 8.95% |
-  | S | 1.44% | 2.11% | 2.77% | 3.43% | 4.09% | 4.75% | 5.42% | 6.08% | 6.74% | 7.40% | 8.06% | 8.73% | 8.82% | 8.82% | 8.82% | 8.83% |
-  | XS | 1.58% | 2.23% | 2.87% | 3.51% | 4.16% | 4.80% | 5.45% | 6.09% | 6.74% | 7.38% | 8.03% | 8.59% | 8.59% | 8.59% | 8.59% | 8.60% |
-  | XXS | 1.98% | 2.57% | 3.17% | 3.76% | 4.36% | 4.95% | 5.54% | 6.14% | 6.73% | 7.33% | 7.92% | 7.91% | 7.91% | 7.91% | 7.91% | 7.92% |
+  **ATTENTION**: The matrix levels have been reversed to make it easier to read.
+
+  | Level      | EASY 1 | EASY 2 | EASY 3 | MAIN 1 | MAIN 2 | MAIN 3 | HARD 1 | HARD 2 | HARD 3 | INSANE 1 | INSANE 2 | INSANE 3 | EXTREME 1 | EXTREME 2 | EXTREME 3 | EXTREME 3+ |
+  |------------|--------|--------|--------|--------|--------|--------|--------|--------|--------|----------|----------|----------|-----------|-----------|-----------|------------|
+  | **WTF**    | 0.0126 | 0.0194 | 0.0263 | 0.0331 | 0.0400 | 0.0469 | 0.0537 | 0.0606 | 0.0674 | 0.0743   | 0.0811   | 0.0880   | 0.0913    | 0.0913    | 0.0913    | 0.0914     |
+  | **XXXL**   | 0.0127 | 0.0195 | 0.0264 | 0.0332 | 0.0401 | 0.0469 | 0.0537 | 0.0606 | 0.0674 | 0.0743   | 0.0811   | 0.0880   | 0.0911    | 0.0911    | 0.0911    | 0.0912     |
+  | **XXL**    | 0.0128 | 0.0197 | 0.0265 | 0.0333 | 0.0401 | 0.0470 | 0.0538 | 0.0606 | 0.0674 | 0.0742   | 0.0811   | 0.0879   | 0.0909    | 0.0909    | 0.0909    | 0.0910     |
+  | **XL**     | 0.0130 | 0.0198 | 0.0266 | 0.0334 | 0.0402 | 0.0470 | 0.0538 | 0.0606 | 0.0674 | 0.0742   | 0.0810   | 0.0878   | 0.0905    | 0.0905    | 0.0905    | 0.0906     |
+  | **L**      | 0.0133 | 0.0201 | 0.0268 | 0.0336 | 0.0404 | 0.0471 | 0.0539 | 0.0607 | 0.0674 | 0.0742   | 0.0809   | 0.0877   | 0.0901    | 0.0901    | 0.0901    | 0.0902     |
+  | **M**      | 0.0137 | 0.0204 | 0.0272 | 0.0339 | 0.0406 | 0.0473 | 0.0540 | 0.0607 | 0.0674 | 0.0741   | 0.0808   | 0.0875   | 0.0894    | 0.0894    | 0.0894    | 0.0895     |
+  | **S**      | 0.0144 | 0.0211 | 0.0277 | 0.0343 | 0.0409 | 0.0475 | 0.0542 | 0.0608 | 0.0674 | 0.0740   | 0.0806   | 0.0873   | 0.0882    | 0.0882    | 0.0882    | 0.0883     |
+  | **XS**     | 0.0158 | 0.0223 | 0.0287 | 0.0351 | 0.0416 | 0.0480 | 0.0545 | 0.0609 | 0.0674 | 0.0738   | 0.0803   | 0.0859   | 0.0859    | 0.0859    | 0.0859    | 0.0860     |
+  | **XXS**    | 0.0198 | 0.0257 | 0.0317 | 0.0376 | 0.0436 | 0.0495 | 0.0554 | 0.0614 | 0.0673 | 0.0733   | 0.0792   | 0.0791   | 0.0791    | 0.0791    | 0.0791    | 0.0792     |
 </details>
-
-### <Badge text="New" variant="note" /> `/report` command
-
-You are now able to report a player without opening a ticket on discord. To use this command, you can enter `/report <playername> <reason>`.
-You can only report players connected to the current server.
 
 ### <Badge text="Change" variant="tip" /> Changes
 - `/power` now shows the remaining time until it can be used again. [KoG-teeworlds/community#25](https://github.com/KoG-teeworlds/community/issues/25)
