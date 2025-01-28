@@ -32,9 +32,9 @@ $$
 **Probability Formula:**
 
 $$
-\text{probability} = \left( \frac{\text{level}}{\text{max\_levels}} \cdot \text{level\_weight} \right) 
-+ \left( \frac{\text{length}}{\text{max\_length}} \cdot \text{length\_weight} \right)
-\cdot \text{matrix}[\text{length}][\text{level}]
+\text{probability} = \left( \left( \frac{\text{level}}{\text{max_levels}} \cdot \text{level_weight} \right)
++ \left( \frac{\text{length}}{\text{max_length}} \right) \cdot \text{length_weight} \right)
+\times \text{matrix}[\text{length}][\text{level}]
 $$
 
 **Example Calculations:**
@@ -43,22 +43,22 @@ $$
 
 $$
 \text{level} = 16, \, \text{length} = 9, \, \text{matrix}[9][16] = 0.0914 \\
-\text{probability} = \left( \frac{\text{16}}{\text{16}} \cdot \text{0.6} \right) 
-+ \left( \frac{\text{9}}{\text{9}} \cdot \text{0.4} \right)
+\text{probability} = \left( \left( \frac{\text{16}}{\text{16}} \cdot \text{0.6} \right) 
++ \left( \frac{\text{9}}{\text{9}} \cdot \text{0.4} \right) \right)
 \cdot 0.0914 \\
-= 1 \cdot 0.6 + 1 \cdot 0.4 \cdot 0.0914 \\
-= 0.6 + 0.03656 = 0.63656 \cdot 100 = 63.66\%
+= \left( 1 \cdot 0.6 + 1 \cdot 0.4 \right) \cdot 0.0914 \\
+= 1 \cdot 0.0914 = 0.0914 \cdot 100 = 9,14\%
 $$
 
 2. **Easy 1 on a XXS map:**
 
 $$
 \text{level} = 1, \, \text{length} = 1, \, \text{matrix}[1][1] = 0.0198 \\
-\text{probability} = \left( \frac{\text{1}}{\text{16}} \cdot \text{0.6} \right) 
-+ \left( \frac{\text{1}}{\text{9}} \cdot \text{0.4} \right)
+\text{probability} = \left( \left( \frac{\text{1}}{\text{16}} \cdot \text{0.6} \right) 
++ \left( \frac{\text{1}}{\text{9}} \cdot \text{0.4} \right) \right)
 \cdot 0.0198 \\
-= 0.0625 \cdot 0.6 + 0.1111 \cdot 0.4 \cdot 0.0198 \\
-= 0.0375 + 0.00087912 = 0.03838 \cdot 100 = 3.84\%
+= \left( \left( 0.0625 \cdot 0.6 \right) + \left( 0.1111 \cdot 0.4 \right) \right) \cdot 0.0198 \\
+= 0.08194 \cdot 0.0198 = 0.001622 \cdot 100 = 0.1\%
 $$
 
 <details>
@@ -77,6 +77,41 @@ $$
   | **S**      | 0.0144 | 0.0211 | 0.0277 | 0.0343 | 0.0409 | 0.0475 | 0.0542 | 0.0608 | 0.0674 | 0.0740   | 0.0806   | 0.0873   | 0.0882    | 0.0882    | 0.0882    | 0.0883     |
   | **XS**     | 0.0158 | 0.0223 | 0.0287 | 0.0351 | 0.0416 | 0.0480 | 0.0545 | 0.0609 | 0.0674 | 0.0738   | 0.0803   | 0.0859   | 0.0859    | 0.0859    | 0.0859    | 0.0860     |
   | **XXS**    | 0.0198 | 0.0257 | 0.0317 | 0.0376 | 0.0436 | 0.0495 | 0.0554 | 0.0614 | 0.0673 | 0.0733   | 0.0792   | 0.0791   | 0.0791    | 0.0791    | 0.0791    | 0.0792     |
+</details>
+
+<details>
+  <summary>Implementation detail</summary>
+
+  ```python title="Python implementation"
+    import random
+
+    PROBABILITY_MATRIX = [
+      [0.0198, 0.0257, 0.0317, 0.0376, 0.0436, ..., 0.0791, 0.0792],
+      ...,
+      [0.0126, 0.0194, 0.0263, ..., 0.0913, 0.0913, 0.0914]
+    ]
+    MAX_LEVEL = 16
+    LEVEL_WEIGHT = 0.6
+
+    MAX_DIFFICULTY = 9
+    DIFFICULTY_WEIGHT = 0.4
+
+    # For demonstration purpose, no out of bound checks are performed
+    def trigger_event(level: int, difficulty: int):
+        # Look up the probability
+        probability_multiplier = PROBABILITY_MATRIX[level][difficulty]
+        level_multiplier = (level / MAX_LEVEL) * LEVEL_WEIGHT
+        difficulty_multiplier = (difficulty / MAX_DIFFICULTY) * DIFFICULTY_WEIGHT
+
+        probabilty = (level_multiplier + difficulty_multiplier) * probability_multiplier
+        
+        # Check if the event should be triggered
+        if random.random() <= probability:
+            return True
+        else:
+            return False
+  ```
+
 </details>
 
 ### <Badge text="Change" variant="tip" /> Changes
