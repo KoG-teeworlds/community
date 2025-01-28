@@ -13,6 +13,43 @@ import { Card, Icon, Aside, Badge } from '@astrojs/starlight/components';
 
 ## Highlights
 
+### <Badge text="New" variant="note" /> MapEvent-Reward Probability Matrix
+
+The MapEvent-Reward Probability Matrix explains how likely it is that a player gets a specific reward. Rewards can be combined, the probability is calculated based on the level and the difficulty of the map and per reward.
+
+<details>
+  <summary>Show Formula</summary>
+
+  The probability is calculated by the following formula:
+
+  $$
+  \text{max\_levels} = 16 \\
+  \text{max\_length} = 9 \\
+  \text{level\_weight} = 0.6 \, (60\%) \\
+  \text{length\_weight} = 0.4 \, (40\%) \\
+  \text{matrix}[\text{length}][\text{level}] \, \text{retrieved from the table}
+  $$
+
+  **Probability Formula:**
+
+  $$
+  \text{probability} = \left( \left( \frac{\text{level}}{\text{max\_levels}} \cdot \text{level\_weight} \right)
+  + \left( \frac{\text{length}}{\text{max\_length}} \right) \cdot \text{length\_weight} \right)
+  \times \left( \text{matrix}[\text{length}][\text{level}] \cdot 10 \right) \cdot \text{item\_matrix[\text{item\_level}]}
+  $$
+</details>
+
+<details>
+  <summary>Map Event Reward Probability Matrix</summary>
+
+  To calculate the <code>item_level</code> you have to divide the percentage by 100 to get the used decimal value. Example <code>50 / 100 = 0.5</code>
+
+  | Reward | Chance |
+  | --- | --- |
+  | Season Points | 50% |
+  | Power | 25% |
+</details>
+
 ### <Badge text="New" variant="note" /> MapEvent Probability Matrix
 
 The MapEvent Probability Matrix explains how likely it is that a player finish will trigger a Custom Random Map Event.
@@ -66,7 +103,7 @@ It is possible that multiple MapEvents are on a map.
 </details>
 
 <details>
-  <summary>Show Matrix</summary>
+  <summary>Show Map Event Probability Matrix</summary>
 
   **ATTENTION**: The matrix levels have been reversed to make it easier to read. There is no mathematical expression, the values are purely based on random numbers between a specific threshold.
 
