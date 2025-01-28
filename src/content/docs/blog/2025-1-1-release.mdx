@@ -19,47 +19,51 @@ The MapEvent Probability Matrix explains how likely it is that a player finish w
 Every finish counts as a roll, the probability is calculated based on the level of the map and the difficulty of the event.
 It is possible that multiple MapEvents are on a map.
 
-The probability is calculated by the following formula:
+<details>
+  <summary>Show Formula</summary>
 
-$$
-\text{max\_levels} = 16 \\
-\text{max\_length} = 9 \\
-\text{level\_weight} = 0.6 \, (60\%) \\
-\text{length\_weight} = 0.4 \, (40\%) \\
-\text{matrix}[\text{length}][\text{level}] \, \text{retrieved from the table}
-$$
+  The probability is calculated by the following formula:
 
-**Probability Formula:**
+  $$
+  \text{max\_levels} = 16 \\
+  \text{max\_length} = 9 \\
+  \text{level\_weight} = 0.6 \, (60\%) \\
+  \text{length\_weight} = 0.4 \, (40\%) \\
+  \text{matrix}[\text{length}][\text{level}] \, \text{retrieved from the table}
+  $$
 
-$$
-\text{probability} = \left( \left( \frac{\text{level}}{\text{max\_levels}} \cdot \text{level\_weight} \right)
-+ \left( \frac{\text{length}}{\text{max\_length}} \right) \cdot \text{length\_weight} \right)
-\times \text{matrix}[\text{length}][\text{level}]
-$$
+  **Probability Formula:**
 
-**Example Calculations:**
+  $$
+  \text{probability} = \left( \left( \frac{\text{level}}{\text{max\_levels}} \cdot \text{level\_weight} \right)
+  + \left( \frac{\text{length}}{\text{max\_length}} \right) \cdot \text{length\_weight} \right)
+  \times \text{matrix}[\text{length}][\text{level}]
+  $$
 
-1. **Extreme 3+ on a WTF map:**
+  **Example Calculations:**
 
-$$
-\text{level} = 16, \, \text{length} = 9, \, \text{matrix}[9][16] = 0.0914 \\
-\text{probability} = \left( \left( \frac{\text{16}}{\text{16}} \cdot \text{0.6} \right) 
-+ \left( \frac{\text{9}}{\text{9}} \cdot \text{0.4} \right) \right)
-\cdot 0.0914 \\
-= \left( 1 \cdot 0.6 + 1 \cdot 0.4 \right) \cdot 0.0914 \\
-= 1 \cdot 0.0914 = 0.0914 \cdot 100 = 9,14\%
-$$
+  1. **Extreme 3+ on a WTF map:**
 
-2. **Easy 1 on a XXS map:**
+  $$
+  \text{level} = 16, \, \text{length} = 9, \, \text{matrix}[9][16] = 0.0914 \\
+  \text{probability} = \left( \left( \frac{\text{16}}{\text{16}} \cdot \text{0.6} \right) 
+  + \left( \frac{\text{9}}{\text{9}} \cdot \text{0.4} \right) \right)
+  \cdot 0.0914 \\
+  = \left( 1 \cdot 0.6 + 1 \cdot 0.4 \right) \cdot 0.0914 \\
+  = 1 \cdot 0.0914 = 0.0914 \cdot 100 = 9,14\%
+  $$
 
-$$
-\text{level} = 1, \, \text{length} = 1, \, \text{matrix}[1][1] = 0.0198 \\
-\text{probability} = \left( \left( \frac{\text{1}}{\text{16}} \cdot \text{0.6} \right) 
-+ \left( \frac{\text{1}}{\text{9}} \cdot \text{0.4} \right) \right)
-\cdot 0.0198 \\
-= \left( \left( 0.0625 \cdot 0.6 \right) + \left( 0.1111 \cdot 0.4 \right) \right) \cdot 0.0198 \\
-= 0.08194 \cdot 0.0198 = 0.001622 \cdot 100 = 0.1\%
-$$
+  2. **Easy 1 on a XXS map:**
+
+  $$
+  \text{level} = 1, \, \text{length} = 1, \, \text{matrix}[1][1] = 0.0198 \\
+  \text{probability} = \left( \left( \frac{\text{1}}{\text{16}} \cdot \text{0.6} \right) 
+  + \left( \frac{\text{1}}{\text{9}} \cdot \text{0.4} \right) \right)
+  \cdot 0.0198 \\
+  = \left( \left( 0.0625 \cdot 0.6 \right) + \left( 0.1111 \cdot 0.4 \right) \right) \cdot 0.0198 \\
+  = 0.08194 \cdot 0.0198 = 0.001622 \cdot 100 = 0.1\%
+  $$
+</details>
 
 <details>
   <summary>Show Matrix</summary>
@@ -119,7 +123,7 @@ $$
 - Skipping non important events in the backend if older than 20 minutes (faster processing after servers reconnect again)
 - Merge upstream DDNet 18.9.1. [DDNet-Release 18.9.1](https://github.com/ddnet/ddnet/releases/tag/18.9.1)
 - Refactoring network-wide protocol
-  - `PlayerFinishEvent` and `TeamFinishEvent` now unified into a `TeamFinishEvent`, to check if its a solo run you can rely on the length of the player list and the team attribute (Team 0 is special and can be considered a solo finish).
+  - `PlayerFinishEvent` and `TeamFinishEvent` now unified into a `FinishEvent`, to check if its a solo run you can rely on the length of the player list and the team attribute (Team 0 is special and can be considered a solo finish).
 
 ### <Badge text="Bugfix" variant="danger" /> Bugfixes
 - Using `/roll` after being muted is now fixed. [KoG-teeworlds/community#24](https://github.com/KoG-teeworlds/community/issues/24)
