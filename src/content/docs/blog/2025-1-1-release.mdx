@@ -16,7 +16,10 @@ import { Card, Icon, Aside, Badge } from '@astrojs/starlight/components';
 ### <Badge text="New" variant="note" /> MapEvent Probability Matrix
 
 The MapEvent Probability Matrix explains how likely it is that a player finish will trigger a Custom Random Map Event.
-Every finish counts as a roll, the probability is calculated based on the level of the map and the difficulty of the event. The probability is calculated by the following formula:
+Every finish counts as a roll, the probability is calculated based on the level of the map and the difficulty of the event.
+It is possible that multiple MapEvents are on a map.
+
+The probability is calculated by the following formula:
 
 $$
 \text{max\_levels} = 16 \\
@@ -81,7 +84,7 @@ $$
 - Skipping non important events in the backend if older than 20 minutes (faster processing after servers reconnect again)
 - Merge upstream DDNet 18.9.1. [DDNet-Release 18.9.1](https://github.com/ddnet/ddnet/releases/tag/18.9.1)
 - Refactoring network-wide protocol
-  - `PlayerFinishEvent` and `TeamFinishEvent` now unified into a `TeamFinishEvent`, to check if its a solo run you can rely on the length of the player list.
+  - `PlayerFinishEvent` and `TeamFinishEvent` now unified into a `TeamFinishEvent`, to check if its a solo run you can rely on the length of the player list and the team attribute (Team 0 is special and can be considered a solo finish).
 
 ### <Badge text="Bugfix" variant="danger" /> Bugfixes
 - Using `/roll` after being muted is now fixed. [KoG-teeworlds/community#24](https://github.com/KoG-teeworlds/community/issues/24)
