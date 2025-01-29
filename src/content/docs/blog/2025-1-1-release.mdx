@@ -155,14 +155,23 @@ It is possible that multiple MapEvents are on a map.
 
 </details>
 
+### <Badge text="New - For Server Providers" variant="note" />Rewrote DNSBL public api
+
+We have rewritten the DNSBL public API to be more efficient and faster. You dont need to change anything, the old DNSBL will be redirected to the new system. If you encounter any issues, please report them to us.
+
 ### <Badge text="Change" variant="tip" /> Changes
 - `/power` now shows the remaining time until it can be used again. [KoG-teeworlds/community#25](https://github.com/KoG-teeworlds/community/issues/25)
 - Skipping non important events in the backend if older than 20 minutes (faster processing after servers reconnect again)
 - Merge upstream DDNet 18.9.1. [DDNet-Release 18.9.1](https://github.com/ddnet/ddnet/releases/tag/18.9.1)
 - Refactoring network-wide protocol
   - `PlayerFinishEvent` and `TeamFinishEvent` now unified into a `FinishEvent`, to check if its a solo run you can rely on the length of the player list and the team attribute (Team 0 is special and can be considered a solo finish).
+  - Minor renamings
+  - Removed unused fields
+  - Removed unused events
+  - Removed unused commands
 - Renamed `[ACC]` to `[Accounts]` for consistency.
 
 ### <Badge text="Bugfix" variant="danger" /> Bugfixes
 - Using `/roll` after being muted is now fixed. [KoG-teeworlds/community#24](https://github.com/KoG-teeworlds/community/issues/24)
 - Fixing a possible crash. (KoG internal report)
+- Fixed a cache invalidation bug.
