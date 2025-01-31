@@ -1,0 +1,178 @@
+---
+title: "2025.11.3 - Release"
+version: "2025.11.3"
+date: 2025-01-31
+authors:
+ - name: 'Avolicious'
+   title: 'Project Maintainer'
+   picture: 'authors/avolicious.webp'
+   url: 'https://kog.tw'
+---
+
+import { Card, Icon, Aside, Badge } from '@astrojs/starlight/components';
+
+## Highlights
+
+### <Badge text="New" variant="note" /> MapEvent-Reward Probability Matrix
+
+The MapEvent-Reward Probability Matrix explains how likely it is that a player gets a specific reward. Rewards can be combined, the probability is calculated based on the level and the difficulty of the map and per reward.
+
+<details>
+  <summary>Show Formula</summary>
+
+  The probability is calculated by the following formula:
+
+  $$
+  \text{max\_levels} = 16 \\
+  \text{max\_length} = 9 \\
+  \text{level\_weight} = 0.6 \, (60\%) \\
+  \text{length\_weight} = 0.4 \, (40\%) \\
+  \text{matrix}[\text{length}][\text{level}] \, \text{retrieved from the table}
+  $$
+
+  **Probability Formula:**
+
+  $$
+  \text{probability} = \left( \left( \frac{\text{level}}{\text{max\_levels}} \cdot \text{level\_weight} \right)
+  + \left( \frac{\text{length}}{\text{max\_length}} \right) \cdot \text{length\_weight} \right)
+  \times \left( \text{matrix}[\text{length}][\text{level}] \cdot 10 \right) \cdot \text{item\_matrix[\text{item\_level}]}
+  $$
+</details>
+
+<details>
+  <summary>Map Event Reward Probability Matrix</summary>
+
+  To calculate the <code>item_level</code> you have to divide the percentage by 100 to get the used decimal value. Example <code>50 / 100 = 0.5</code>
+
+  | Reward | Chance |
+  | --- | --- |
+  | Season Points | 50% |
+  | Power | 25% |
+</details>
+
+### <Badge text="New" variant="note" /> MapEvent Probability Matrix
+
+The MapEvent Probability Matrix explains how likely it is that a player finish will trigger a Custom Random Map Event.
+Every finish counts as a roll, the probability is calculated based on the level of the map and the difficulty of the event.
+It is possible that multiple MapEvents are on a map.
+
+<details>
+  <summary>Show Formula</summary>
+
+  The probability is calculated by the following formula:
+
+  $$
+  \text{max\_levels} = 16 \\
+  \text{max\_length} = 9 \\
+  \text{level\_weight} = 0.6 \, (60\%) \\
+  \text{length\_weight} = 0.4 \, (40\%) \\
+  \text{matrix}[\text{length}][\text{level}] \, \text{retrieved from the table}
+  $$
+
+  **Probability Formula:**
+
+  $$
+  \text{probability} = \left( \left( \frac{\text{level}}{\text{max\_levels}} \cdot \text{level\_weight} \right)
+  + \left( \frac{\text{length}}{\text{max\_length}} \right) \cdot \text{length\_weight} \right)
+  \times \text{matrix}[\text{length}][\text{level}]
+  $$
+
+  **Example Calculations:**
+
+  1. **Extreme 3+ on a WTF map:**
+
+  $$
+  \text{level} = 16, \, \text{length} = 9, \, \text{matrix}[9][16] = 0.0914 \\
+  \text{probability} = \left( \left( \frac{\text{16}}{\text{16}} \cdot \text{0.6} \right) 
+  + \left( \frac{\text{9}}{\text{9}} \cdot \text{0.4} \right) \right)
+  \cdot 0.0914 \\
+  = \left( 1 \cdot 0.6 + 1 \cdot 0.4 \right) \cdot 0.0914 \\
+  = 1 \cdot 0.0914 = 0.0914 \cdot 100 = 9,14\%
+  $$
+
+  2. **Easy 1 on a XXS map:**
+
+  $$
+  \text{level} = 1, \, \text{length} = 1, \, \text{matrix}[1][1] = 0.0198 \\
+  \text{probability} = \left( \left( \frac{\text{1}}{\text{16}} \cdot \text{0.6} \right) 
+  + \left( \frac{\text{1}}{\text{9}} \cdot \text{0.4} \right) \right)
+  \cdot 0.0198 \\
+  = \left( \left( 0.0625 \cdot 0.6 \right) + \left( 0.1111 \cdot 0.4 \right) \right) \cdot 0.0198 \\
+  = 0.08194 \cdot 0.0198 = 0.001622 \cdot 100 = 0.1\%
+  $$
+</details>
+
+<details>
+  <summary>Show Map Event Probability Matrix</summary>
+
+  **ATTENTION**: The matrix levels have been reversed to make it easier to read. There is no mathematical expression, the values are purely based on random numbers between a specific threshold.
+
+  | Level      | EASY 1 | EASY 2 | EASY 3 | MAIN 1 | MAIN 2 | MAIN 3 | HARD 1 | HARD 2 | HARD 3 | INSANE 1 | INSANE 2 | INSANE 3 | EXTREME 1 | EXTREME 2 | EXTREME 3 | EXTREME 3+ |
+  |------------|--------|--------|--------|--------|--------|--------|--------|--------|--------|----------|----------|----------|-----------|-----------|-----------|------------|
+  | **WTF**    | 0.0126 | 0.0194 | 0.0263 | 0.0331 | 0.0400 | 0.0469 | 0.0537 | 0.0606 | 0.0674 | 0.0743   | 0.0811   | 0.0880   | 0.0913    | 0.0913    | 0.0913    | 0.0914     |
+  | **XXXL**   | 0.0127 | 0.0195 | 0.0264 | 0.0332 | 0.0401 | 0.0469 | 0.0537 | 0.0606 | 0.0674 | 0.0743   | 0.0811   | 0.0880   | 0.0911    | 0.0911    | 0.0911    | 0.0912     |
+  | **XXL**    | 0.0128 | 0.0197 | 0.0265 | 0.0333 | 0.0401 | 0.0470 | 0.0538 | 0.0606 | 0.0674 | 0.0742   | 0.0811   | 0.0879   | 0.0909    | 0.0909    | 0.0909    | 0.0910     |
+  | **XL**     | 0.0130 | 0.0198 | 0.0266 | 0.0334 | 0.0402 | 0.0470 | 0.0538 | 0.0606 | 0.0674 | 0.0742   | 0.0810   | 0.0878   | 0.0905    | 0.0905    | 0.0905    | 0.0906     |
+  | **L**      | 0.0133 | 0.0201 | 0.0268 | 0.0336 | 0.0404 | 0.0471 | 0.0539 | 0.0607 | 0.0674 | 0.0742   | 0.0809   | 0.0877   | 0.0901    | 0.0901    | 0.0901    | 0.0902     |
+  | **M**      | 0.0137 | 0.0204 | 0.0272 | 0.0339 | 0.0406 | 0.0473 | 0.0540 | 0.0607 | 0.0674 | 0.0741   | 0.0808   | 0.0875   | 0.0894    | 0.0894    | 0.0894    | 0.0895     |
+  | **S**      | 0.0144 | 0.0211 | 0.0277 | 0.0343 | 0.0409 | 0.0475 | 0.0542 | 0.0608 | 0.0674 | 0.0740   | 0.0806   | 0.0873   | 0.0882    | 0.0882    | 0.0882    | 0.0883     |
+  | **XS**     | 0.0158 | 0.0223 | 0.0287 | 0.0351 | 0.0416 | 0.0480 | 0.0545 | 0.0609 | 0.0674 | 0.0738   | 0.0803   | 0.0859   | 0.0859    | 0.0859    | 0.0859    | 0.0860     |
+  | **XXS**    | 0.0198 | 0.0257 | 0.0317 | 0.0376 | 0.0436 | 0.0495 | 0.0554 | 0.0614 | 0.0673 | 0.0733   | 0.0792   | 0.0791   | 0.0791    | 0.0791    | 0.0791    | 0.0792     |
+</details>
+
+<details>
+  <summary>Implementation detail</summary>
+
+  ```python title="Python implementation"
+    import random
+
+    PROBABILITY_MATRIX = [
+      [0.0198, 0.0257, 0.0317, 0.0376, 0.0436, ..., 0.0791, 0.0792],
+      ...,
+      [0.0126, 0.0194, 0.0263, ..., 0.0913, 0.0913, 0.0914]
+    ]
+    MAX_LEVEL = 16
+    LEVEL_WEIGHT = 0.6
+
+    MAX_DIFFICULTY = 9
+    DIFFICULTY_WEIGHT = 0.4
+
+    # For demonstration purpose, no out of bound checks are performed
+    def trigger_event(level: int, difficulty: int):
+        # Look up the probability
+        probability_multiplier = PROBABILITY_MATRIX[level][difficulty]
+        level_multiplier = (level / MAX_LEVEL) * LEVEL_WEIGHT
+        difficulty_multiplier = (difficulty / MAX_DIFFICULTY) * DIFFICULTY_WEIGHT
+
+        probabilty = (level_multiplier + difficulty_multiplier) * probability_multiplier
+        
+        # Check if the event should be triggered
+        if random.random() <= probability:
+            return True
+        else:
+            return False
+  ```
+
+</details>
+
+### <Badge text="New - For Server Providers" variant="note" />Rewrote DNSBL public api
+
+We have rewritten the DNSBL public API to be more efficient and faster. You dont need to change anything, the old DNSBL will be redirected to the new system. If you encounter any issues, please report them to us.
+
+### <Badge text="Change" variant="tip" /> Changes
+- `/power` now shows the remaining time until it can be used again. [KoG-teeworlds/community#25](https://github.com/KoG-teeworlds/community/issues/25)
+- Skipping non important events in the backend if older than 20 minutes (faster processing after servers reconnect again)
+- Merge upstream DDNet 18.9.1. [DDNet-Release 18.9.1](https://github.com/ddnet/ddnet/releases/tag/18.9.1)
+- Refactoring network-wide protocol
+  - `PlayerFinishEvent` and `TeamFinishEvent` now unified into a `FinishEvent`, to check if its a solo run you can rely on the length of the player list and the team attribute (Team 0 is special and can be considered a solo finish).
+  - Minor renamings
+  - Removed unused fields
+  - Removed unused events
+  - Removed unused commands
+- Renamed `[ACC]` to `[Accounts]` for consistency.
+- Prepared some services for the upcoming backstage.io integration.
+
+### <Badge text="Bugfix" variant="danger" /> Bugfixes
+- Using `/roll` after being muted is now fixed. [KoG-teeworlds/community#24](https://github.com/KoG-teeworlds/community/issues/24)
+- Fixing a possible crash. (KoG internal report)
+- Fixed a cache invalidation bug.

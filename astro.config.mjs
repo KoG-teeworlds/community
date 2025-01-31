@@ -2,6 +2,8 @@
 import { defineConfig } from "astro/config";
 import starlight from "@astrojs/starlight";
 import starlightBlog from 'starlight-blog';
+import remarkMath from 'remark-math'
+import rehypeKatex from 'rehype-katex'
 
 // https://astro.build/config
 export default defineConfig({
@@ -13,9 +15,13 @@ export default defineConfig({
       rollupOptions: {}
     }
   },
+  markdown: {
+    remarkPlugins: [remarkMath],
+    rehypePlugins: [rehypeKatex]
+  },
   integrations: [starlight({
     title: "KoG Community",
-    customCss: ["./src/styles/custom.css"],
+    customCss: ["./src/styles/custom.css", "./src/styles/mathjax.css"],
     components: {},
     favicon: "/tee_light.svg",
     logo: {
