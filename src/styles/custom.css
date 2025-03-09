@@ -42,8 +42,3 @@ html {
     scroll-behavior: auto;
   }
 }
-
-.paragraph-leading-icon {
-  display: inline !important;
-  vertical-align: middle;
-}
