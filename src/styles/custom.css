@@ -32,3 +32,13 @@
   --sl-content-width: 90%;
   --sl-text-5xl: 3.5rem;
 }
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media screen and (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
