@@ -1,0 +1,119 @@
+---
+title: "Registration & Migration"
+description: ""
+prev: false
+next: false
+sidebar:
+  order: 2
+---
+
+import { Aside } from "@astrojs/starlight/components";
+import { Steps } from '@astrojs/starlight/components';
+
+<Aside type="tip">
+If you run into any issues, make sure to check the [Frequently Asked Questions](/information/faq) first. Most issues or questions that may come up during the process are already answered here.
+
+If you cannot find a solution to your problem there, you can join our [Discord server](https://discord.kog.tw) to ask for support. Open the [#create-a-ticket](https://discord.com/channels/342003344476471296/962333808189919242) channel and use the button "Registration" to create a new ticket. This will create a new channel for you where you can describe your issue. A moderator will respond to you as soon as possible.
+</Aside>
+
+## About the account system
+
+### What is "KoG 2.0" and why is a "Migration" neccessary?
+
+With the introduction of <nobr>KoG 2.0</nobr> we have implemented a new system that ensures players are not only tied to their <nobr>"KoG identity"</nobr> by means of their in-game nickname. In the past, any maps you finished and points you collected were only tied to your in-game nickname. We now have a system in place that allows you to create an account on our website and link it to your in-game nickname. The migration process is necessary to link your in-game nickname to your new account.
+
+This also allows us to moderate the KoG servers more effectively. For example, it ensures that others cannot simply impersonate you by using your in-game nickname and get you banned, since they cannot login with your account.
+
+During the migration process an AI will analyze your gameplay from previous sessions on KoG servers and check for any abnormalities. This will help us exclude botters and cheaters to maintain the competitive integrity of the servers and ensure a fair and fun experience for everyone.
+
+### Why should I register an account?
+
+There are many benefits to playing with an account, for example:
+
+- If you play on non "[A]" servers, you cannot be funvoted by players who are not logged in
+- If a player who is logged in funvotes you or is otherwise disruptive, moderators can take action against them more easily
+- You can join "[A]" servers and play with other verified players
+
+## Getting Started
+
+### Choosing your in-game nickname
+
+If you have never played on KoG servers before, please ensure that you're using an in-game nickname that has not been used before. You can check this by connecting to a KoG server that does not include "[A]" in the server name and using the `/points` command. If you already have points, but never finished a map before, it means that someone else has been using your in-game nickname before. In this case, you should choose a different in-game nickname.
+
+<Aside>
+You may need to finish several maps and gather points on your chosen in-game nickname before you can begin the migration process. This is necessary to ensure that the AI has enough data to analyze your gameplay and detect any abnormalities.
+
+See also: [4.2 I cannot create an account, it says: “Please finish a map on non [A] servers first before registering.”](/information/faq/#42-i-cannot-create-an-account-it-says-please-finish-a-map-on-non-a-servers-first-before-registering)
+
+</Aside>
+
+### Registration
+
+First, you need to create an account on our website. To do this, follow these steps:
+
+<Steps>
+1. Open the [registration page](https://kog.tw/register.php) on our website
+2. Enter your in-game name, your e-mail address and a password of no more than 10 characters containing only letters and numbers
+3. If the name is not already registered, you should now receive a message that the "name has been pre-claimed"
+4. Open the [#create-a-ticket](https://discord.com/channels/342003344476471296/962333808189919242) channel in our Discord server and use the button "Registration" to create a new ticket
+5. Open the channel that was created for you and ask a moderator to confirm your registration
+6. Open the [login page](https://kog.tw/login.php) on our website and log in with the same e-mail address and password that you set during registration
+7. We **highly** recommend linking your Discord account to your KoG account at this point
+8. Click on your name in the top right-hand corner of the website and select "Dashboard"
+9. Scroll down to accept the ToS (Terms of Service)
+</Steps>
+
+### Migration
+
+Now that you have registered an account, you can start the migration process. To do this, follow these steps:
+
+<Steps>
+1. Open [Zitadel](https://auth.kog.tw) in your browser
+2. Click the register button and fill out the form (you can enter anything for first name and surname)
+3. After clicking the next button you should receive an e-mail with a code
+4. Open the e-mail and click the blue button or copy the code
+5. You should now see "User activated" - click next and login
+6. Now you can choose if you want to use two factor authentication (Optional, but recommended)
+7. Open [our website](https://kog.tw) and log in, then click the start migration button
+8. Now there should be a blue "next" button - click that button then click the blue start migration button
+9. If get an "undefined" error then just click on start migration again
+10. You should now receive an e-mail from KoG - click on the "migrate now" button
+11. Now click the blue "login to kog one" button and then login with your Zitadel account
+12. It should now say: "Account successfully queued for migration." 
+</Steps>
+
+<Aside type="caution">
+The migration process typically takes anywhere from a couple of hours to several days, depending on how much data you have generated from previous gameplay on KoG servers and whether any abnormalities in your gameplay were detected.
+
+In some cases a manual review by a moderator is required. Please understand that the moderators are providing support free-of-charge and in their free time. They are doing their best to help you, but sometimes it can take a while until they can respond to you. There are typically hundreds of open tickets at any given time, so *please be patient* and do not create multiple tickets. A moderator will respond to your ticket *as soon as possible*. Spamming the moderators will _not_ speed up the process.
+</Aside>
+
+
+See also:
+- [1.4 How long does it take to migrate?](/information/faq/#14-how-long-does-it-take-to-migrate)
+- [1.5 How can I check the status of my migration?](/information/faq/#15-how-can-i-check-the-status-of-my-migration)
+- [1.6 Why does my migration need a manual review?](/information/faq/#16-why-does-my-migration-need-a-manual-review)
+- [1.7 My migration status says that I have been banned, what can I do?](/information/faq/#17-my-migration-status-says-that-i-have-been-banned-what-can-i-do)
+- [4.2 I cannot create an account, it says: “Please finish a map on non [A] servers first before registering.”](/information/faq/#42-i-cannot-create-an-account-it-says-please-finish-a-map-on-non-a-servers-first-before-registering)
+- [4.4 I cannot finish the migration, it says: "There is a problem within the migration! Please create a ticket on the KoG Discord and add ref... in the ticket"](/information/faq/#44-i-cannot-finish-the-migration-it-says-there-is-a-problem-within-the-migration-please-create-a-ticket-on-the-kog-discord-and-add-ref-in-the-ticket)
+- [4.5 I cannot proceed with the migration, it says: "Unknown error, please open a ticket on Discord to ask for a reset."](/information/faq/#45-i-cannot-proceed-with-the-migration-it-says-unknown-error-please-open-a-ticket-on-discord-to-ask-for-a-reset)
+- [4.6 I cannot proceed with the migration, it says: "Verify your KoG One Account"](/information/faq/#46-i-cannot-proceed-with-the-migration-it-says-verify-your-kog-one-account)
+- [4.7 I cannot proceed with the migration, I did not receive an email to verify my account](/information/faq/#47-i-cannot-proceed-with-the-migration-i-did-not-receive-an-email-to-verify-my-account)
+
+### In-game login
+
+Once you have finished the registration & migration process, you can generate a login code that is used to login in-game while playing on KoG servers. To do this, follow these steps:
+
+<Steps>
+1. Open [kog.tw](https://kog.tw/) in your browser
+2. Click on "Login" in the top right corner and sign-in
+3. Click on your username in the top right corner and select "Ingame login"
+4. Click on "Generate a login"
+</Steps>
+
+This will generate a new code that you can use in-game to login using the command <nobr>`/login [code]`</nobr>. You can also use the copy the `bind` command that is shown on the website, to set up a keybind to login with a single key press. To do this, open the console in-game by pressing `F1` and paste the command there. You can adjust the keybind by changing the character `l` to any other key.
+
+See also:
+- [4.8 I cannot login on KoG servers, it says: "Your login request is now being processed."](/information/faq/#48-i-cannot-login-on-kog-servers-it-says-your-login-request-is-now-being-processed)
+- [4.9 I cannot login on KoG servers, it says: "User does not exist"](/information/faq/#49-i-cannot-login-on-kog-servers-it-says-user-does-not-exist)
+- [4.10 I cannot login on KoG servers, I forgot my login code](/information/faq/#410-i-cannot-login-on-kog-servers-i-forgot-my-login-code)
