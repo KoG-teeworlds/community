@@ -1,6 +1,8 @@
 ---
 title: "Mapping"
 description: ""
+sidebar:
+  order: 2
 ---
 
 In this guide, we will be breaking down all the mapping rules for KoG. Follow all of these to make high-quality maps and to secure yourself a faster release.
@@ -21,29 +23,29 @@ Here are some parts from older maps that lack creativity and variety:
 
 ![A straight, boring tunnel part with random obstacles](../../../assets/mapping/1.png)
 
-*This part from `Im_Climb5` is just going to the right for half a minute. This is uncreative and repetitive.*
+_This part from `Im_Climb5` is just going to the right for half a minute. This is uncreative and repetitive._
 
 ![A straight, boring tunnel part](../../../assets/mapping/2.png)
 
-*This part from `Kero-Gores3` is not as long but, compared to the part on `Im_Climb5`, it does not utilize flying freeze or hookables in the middle of the tunnel. In general, you do not want to map these kinds of tunnels. It is outdated gameplay which we have seen on many maps already.*
+_This part from `Kero-Gores3` is not as long but, compared to the part on `Im_Climb5`, it does not utilize flying freeze or hookables in the middle of the tunnel. In general, you do not want to map these kinds of tunnels. It is outdated gameplay which we have seen on many maps already._
 
 ![A part that repeats the same move over and over again](../../../assets/mapping/3.png)
 
-*This part from `FlipLipp19` just repeats one move over and over, which is a bad way to design parts. It gets old fast.*
+_This part from `FlipLipp19` just repeats one move over and over, which is a bad way to design parts. It gets old fast._
 
 Let us look at how you can improve on that:
 
 ![An unique part](../../../assets/mapping/4.png)
 
-*This part from `Mainiac` is a better approach to creating a unique experience. It forces players to do different moves within a short time, has specific save spots through scattering the availability of hookables, and has a distinguishing feature through only using 3x3 flying hookables and mostly 3-tile wide freeze.*
+_This part from `Mainiac` is a better approach to creating a unique experience. It forces players to do different moves within a short time, has specific save spots through scattering the availability of hookables, and has a distinguishing feature through only using 3x3 flying hookables and mostly 3-tile wide freeze._
 
 ![An unique part](../../../assets/mapping/5.png)
 
-*Same goes for this part from `Vigorously`. There might be parts that work with a similar structure, but you will not see a part that looks like that on another map. It uses rectangular walls as an outer structure and a more rounded freeze path through the bottom half.*
+_Same goes for this part from `Vigorously`. There might be parts that work with a similar structure, but you will not see a part that looks like that on another map. It uses rectangular walls as an outer structure and a more rounded freeze path through the bottom half._
 
 ![A part that forces different moves](../../../assets/mapping/6.png)
 
-*Parts do not necessarily need to utilize flying hookables or freeze to be good. This part from `Ckis_4_unskilledplayer` does it only passively and works well since it forces players to perform different moves while going left.*
+_Parts do not necessarily need to utilize flying hookables or freeze to be good. This part from `Ckis_4_unskilledplayer` does it only passively and works well since it forces players to perform different moves while going left._
 
 **TIP:** Using passive flying hooks in tunnel-ish parts is an easy way to boost uniqueness.
 
@@ -51,15 +53,15 @@ Since standard gores is not that versatile when it comes to the core gameplay, c
 
 ![The map bazawa](../../../assets/mapping/7.png)
 
-*The probably easiest-to-understand example is the map `bazawa`. It utilizes mostly 2-tilers. Combined with `bzw`’s mapping style, this makes for a unique experience.*
+_The probably easiest-to-understand example is the map `bazawa`. It utilizes mostly 2-tilers. Combined with `bzw`’s mapping style, this makes for a unique experience._
 
 ![The map Stripes](../../../assets/mapping/8.png)
 
-*The map `Stripes` uses, as the name suggests, stripes of freeze to shape its parts. This type of style, while not used as much in other maps as in this map, is more common.*
+_The map `Stripes` uses, as the name suggests, stripes of freeze to shape its parts. This type of style, while not used as much in other maps as in this map, is more common._
 
 ![The map Bl0od4Miku](../../../assets/mapping/9.png)
 
-*If you look at `Bl0od4Miku`, you can see that the mapper, `Bl0od-Dens`, shaped the hookables in a special way. He created his personal mapping style, possibly the first there ever was. You only see this style on his maps or maps that are paying homage to him.*
+_If you look at `Bl0od4Miku`, you can see that the mapper, `Bl0od-Dens`, shaped the hookables in a special way. He created his personal mapping style, possibly the first there ever was. You only see this style on his maps or maps that are paying homage to him._
 
 There are many more styles on already existing maps and even more that haven’t been mapped yet. If you are a beginner, you don’t necessarily have to map in a specific style; this is more for advanced mappers. A personal style will come with time if you refine your mapping skills. However, something that you, even as a beginner, must always keep in mind is that shaping your parts with hookables is, in general, better than shaping them with freeze, and hookables with 1-tile-wide freeze should be the basis of your map since that is the most comfortable.
 
@@ -91,19 +93,17 @@ Difficulty levels naturally vary by a bit, but you can reduce the range. If a mo
 
 All gores maps are designed in a way that a player could finish them by themselves. Furthermore, since traveling back is important to help players who have failed behind, you must be able to go back at any point. Make sure that the way back is not significantly harder than the normal direction.
 
-
 ### 5. The gameplay needs to prevent players from blocking each other, especially in lower difficulties.
 
 While playing Gores, you can get blocked by another player or block others yourself. Sometimes it can be increased or prevented depending on how you design a part.
 
 ![A part that forces you to hook through a crossway of other players](../../../assets/mapping/10.png)
 
-*This part on `TomTom6`, for example, forces players to hook into an area where other players might be. While that is not a problem at this difficulty, you want to keep an eye on such things, especially on Easy and Main.*
+_This part on `TomTom6`, for example, forces players to hook into an area where other players might be. While that is not a problem at this difficulty, you want to keep an eye on such things, especially on Easy and Main._
 
 ![A vertical part where players can fall on each other](../../../assets/mapping/11.png)
 
-*This part on `SkyrelOne` risks players falling on top of each other. While again, for this difficulty, it might not be a problem, a part with such a structure can be problematic on lower difficulties. Try to prevent mapping long sequences of moves where players can fall on each other.*
-
+_This part on `SkyrelOne` risks players falling on top of each other. While again, for this difficulty, it might not be a problem, a part with such a structure can be problematic on lower difficulties. Try to prevent mapping long sequences of moves where players can fall on each other._
 
 ### 6. The spawn and start part must be big enough.
 
@@ -113,8 +113,7 @@ There are some differences depending on the purpose of the map. Smaller, speedru
 
 ![A way too small starting part](../../../assets/mapping/12.png)
 
-*This start part on `MorfeusGrydwin` is arguably the worst ever made. Never start your map like this. Always give players enough room to start and then increase the difficulty gradually to your desired one.*
-
+_This start part on `MorfeusGrydwin` is arguably the worst ever made. Never start your map like this. Always give players enough room to start and then increase the difficulty gradually to your desired one._
 
 ### 7. Major gameplay skips are not allowed.
 
@@ -147,7 +146,6 @@ Everything that is not gameplay relevant must be set to High Detail (HD). To do 
 That means there should be no design bugs in your map. Make sure everything is automapped correctly, every game tile has a corresponding design tile, there are no gaps between freeze and grass, for example, and no naked corners.
 
 Additionally, keep your map file clean. Keep an eye on wrongly embedded or external images (red), remove unused images (blue), layers, groups, and envelopes (green), and keep the layer size as small as possible.
-
 
 ## Final Checks and Submission
 
