@@ -1,35 +1,114 @@
-# Contributor Legal Disclaimer
+# Contributing Guidelines
 
-## Voluntary Contribution Agreement
+Thank you for your interest in contributing to our project! This document outlines the standards and processes we follow to maintain high-quality code and a positive community environment.
 
-By submitting a pull request, issue, or any other contribution to this project, you acknowledge and agree to the following terms:
+## Table of Contents
 
-### 1. Voluntary Basis
-All contributions to this project are made on a strictly voluntary basis. Contributors will not receive any monetary compensation, employment, or other benefits in exchange for their contributions.
+- [Code of Conduct](#code-of-conduct)
+- [How to Contribute](#how-to-contribute)
+- [Commit Standards](#commit-standards)
+- [Code Style](#code-style)
+- [Pull Request Process](#pull-request-process)
+- [Development Workflow](#development-workflow)
+- [Communication](#communication)
+- [Legal Disclaimer](#legal-disclaimer)
 
-### 2. License Grant
-You grant the project owners a perpetual, worldwide, non-exclusive, royalty-free, irrevocable license to use, modify, publish, distribute, and sublicense your contributions under the project's specified license.
+## Code of Conduct
 
-### 3. Ownership of Contributions
-You confirm that your contributions are your original work and that you have the right to make the contributions under these terms. If your contribution includes work that is not your own, you confirm that it is properly licensed for inclusion in this project.
+All contributors are expected to adhere to our [Code of Conduct](CODE_OF_CONDUCT.md). Please read it before contributing.
 
-### 4. No Warranty
-Contributions are provided "as is" without warranty of any kind, express or implied. You are not responsible for any consequences arising from the use of your contributions.
+## How to Contribute
 
-### 5. No Employment Relationship
-Your participation as a contributor does not create an employment, agency, partnership, or joint venture relationship with the project or its maintainers.
+1. **Fork the Repository**: Create your own fork of the project.
+2. **Create a Branch**: Create a branch for your contribution.
+   ```bash
+   git checkout -b feature/your-feature-name
+   ```
+3. **Make Changes**: Implement your changes following our code style guidelines.
+4. **Test**: Ensure all tests pass and add new tests for new functionality.
+5. **Submit a Pull Request**: Open a PR with a clear description of the changes.
 
-### 6. Termination
-You may cease contributing to the project at any time, but your previous contributions will remain licensed under these terms.
+## Commit Standards
 
-### 7. Governing Law
-This agreement shall be governed by and construed in accordance with the laws of the European Union, without regard to its conflict of law principles.
+We follow the [Conventional Commits](https://www.conventionalcommits.org/) specification for creating an explicit commit history. Each commit message should be structured as follows:
 
-### 8. Modification
-The project maintainers reserve the right to modify these terms at any time. Continued contribution after such modifications constitutes acceptance of the modified terms.
+```
+<type>[optional scope]: <description>
+
+[optional body]
+
+[optional footer(s)]
+```
+
+### Types
+
+- **feat**/**enh**: A new feature
+- **fix**: A bug fix
+- **docs**: Documentation only changes
+- **style**: Changes that do not affect the meaning of the code (white-space, formatting, etc.)
+- **refactor**: A code change that neither fixes a bug nor adds a feature
+- **perf**: A code change that improves performance
+- **test**: Adding missing tests or correcting existing tests
+- **chore**: Changes to the build process or auxiliary tools and libraries
+
+### Examples
+
+```
+feat(auth): add user authentication system
+enh: add user authentication system
+fix(dashboard): resolve data loading issue
+docs: update installation instructions
+```
+
+## Code Style
+
+We maintain consistent code style to improve readability and maintainability. Please follow these guidelines:
+
+### General
+
+- Use meaningful variable and function names
+- Keep functions small and focused on a single responsibility
+- Comment your code when necessary, especially for complex logic
+- Remove debug code before committing
+
+### Automated Formatting
+
+We use the following tools to enforce code style:
+
+- ESLint/Prettier for JavaScript/TypeScript
+- Black for Python
+- Stylelint for CSS/SCSS
+
+Please ensure these tools are configured in your development environment.
+
+## Pull Request Process
+
+1. **Create a Descriptive PR**: Include a clear title and description of the changes.
+2. **Link Related Issues**: Reference any related issues using the GitHub issue linking syntax.
+3. **CI Checks**: Ensure all automated tests and checks pass.
+4. **Code Review**: Address any feedback from reviewers.
+5. **Approval**: PRs require approval from at least one maintainer before merging.
+6. **Merge**: A maintainer will merge your PR once it's approved.
+
+## Development Workflow
+
+1. **Issues First**: Start by creating or claiming an issue before working on a change.
+2. **Branch Naming**: Use the following format: `type/description` (e.g., `feature/user-auth`, `fix/login-bug`).
+3. **Keep PRs Focused**: Each PR should address a single concern.
+4. **Regular Updates**: Keep your branches updated with the main branch.
+
+## Communication
+
+- **Discord**: Join our Discord server for real-time communication.
+- **Issues**: Use GitHub issues for bug reports and feature requests.
+- **Discussions**: Use GitHub Discussions for questions and ideas.
+
+Remember to be respectful and constructive in all communications.
+
+## Legal Disclaimer
+
+By contributing to this project, you agree to our [Contributor Legal Disclaimer](LEGAL.md) which outlines the terms of voluntary contribution.
 
 ---
 
-**By contributing to this project, you indicate your acceptance of these terms in full.**
-
-*Last Updated: 2025-03-21*
+Thank you for helping improve our project! Your contributions make this community better for everyone.
