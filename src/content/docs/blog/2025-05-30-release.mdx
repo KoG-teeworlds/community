@@ -14,9 +14,47 @@ import { YouTube } from 'astro-embed';
 
 ## Highlights
 
+### New
+
+### <Badge text="New" variant="note" /> Reworked Leaderboards
+<Aside type="caution">Leaderboards are currently in early access and might not be feature complete.</Aside>
+
+We're implementing a new tiered verification system to better represent the competitive team spirit of KoG and ensure leaderboard integrity. This update introduces four distinct verification levels that more accurately reflect the quality and accountability of recorded finishes.
+
+#### 🏆 Verified Finish (Gold Standard)
+The highest tier of verification requires:
+
+- .teehistorian recording exists
+- All players logged in (no anonymous players)
+- Team play (team 0 excluded)
+
+This ensures that verified finishes represent authentic team gameplay with full player accountability.
+
+#### 🥈 Verifiable Finish (Silver)
+A solid verification level requiring:
+
+- .teehistorian recording exists
+
+This tier maintains good verification standards while being more accessible than the gold standard.
+
+#### 🥉 Accepted Finish (Bronze)
+A basic verification level where:
+
+- Some extent of verification is available
+
+This tier accommodates finishes with partial verification data.
+
+#### ❓ Unverified Finish
+For finishes where:
+
+- No verification information is available
+
+These finishes remain visible but are ranked separately from verified entries.
+
+### <Badge text="New" variant="note" /> Clans
+<Aside type="caution">The clan system is currently not generally available, it is only available to a few clans. There is currently no timeline when its generally available, do not ask the support</Aside>
 
 ### <Badge text="Change" variant="tip" /> Changes
-- Refactored `/top` command.
 - Improved player tracking and statistics collection.
 - Updated gameserver to [DDNet 19.1](https://github.com/ddnet/ddnet/tree/19.1)
 
