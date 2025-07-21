@@ -64,11 +64,7 @@ export default defineConfig({
           href: "https://github.com/KoG-teeworlds/community",
         },
       ],
-      plugins: [
-        starlightBlog({
-          authors: {},
-        }),
-      ],
+      plugins: [starlightBlog()],
       defaultLocale: "root",
       locales: {
         root: {
