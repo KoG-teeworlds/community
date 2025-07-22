@@ -13,99 +13,55 @@ import { Card, Icon, Aside, Badge } from '@astrojs/starlight/components';
 
 ## Highlights
 
-### <Badge text="New" variant="note" /> MapEvent-Reward Probability Matrix
-
-The MapEvent-Reward Probability Matrix explains how likely it is that a player gets a specific reward. Rewards can be combined, the probability is calculated based on the level and the difficulty of the map and per reward.
-
-<details>
-  <summary>Show Formula</summary>
-
-  The probability is calculated by the following formula:
-
-  $$
-  \text{max\_levels} = 16 \\
-  \text{max\_length} = 9 \\
-  \text{level\_weight} = 0.6 \, (60\%) \\
-  \text{length\_weight} = 0.4 \, (40\%) \\
-  \text{matrix}[\text{length}][\text{level}] \, \text{retrieved from the table}
-  $$
-
-  **Probability Formula:**
-
-  $$
-  \text{probability} = \left( \left( \frac{\text{level}}{\text{max\_levels}} \cdot \text{level\_weight} \right)
-  + \left( \frac{\text{length}}{\text{max\_length}} \right) \cdot \text{length\_weight} \right)
-  \times \left( \text{matrix}[\text{length}][\text{level}] \cdot 10 \right) \cdot \text{item\_matrix[\text{item\_level}]}
-  $$
-</details>
-
-<details>
-  <summary>Map Event Reward Probability Matrix</summary>
-
-  To calculate the <code>item_level</code> you have to divide the percentage by 100 to get the used decimal value. Example <code>50 / 100 = 0.5</code>
-
-  | Reward | Chance |
-  | --- | --- |
-  | Season Points | 50% |
-  | Power | 25% |
-</details>
-
 ### <Badge text="New" variant="note" /> MapEvent Probability Matrix
 
 The MapEvent Probability Matrix explains how likely it is that a player finish will trigger a Custom Random Map Event.
-Every finish counts as a roll, the probability is calculated based on the level of the map and the difficulty of the event.
-It is possible that multiple MapEvents are on a map.
+Every finish counts as a roll, the probability is calculated based on the level of the map and the difficulty of the event. The probability is calculated by the following formula:
+
+$$
+\text{max\_levels} = 16 \\
+\text{max\_length} = 9 \\
+\text{level\_weight} = 0.6 \, (60\%) \\
+\text{length\_weight} = 0.4 \, (40\%) \\
+\text{matrix}[\text{length}][\text{level}] \, \text{retrieved from the table}
+$$
+
+**Probability Formula:**
+
+$$
+\text{probability} = \left( \frac{\text{level}}{\text{max\_levels}} \cdot \text{level\_weight} \right) 
++ \left( \frac{\text{length}}{\text{max\_length}} \cdot \text{length\_weight} \right)
+\cdot \text{matrix}[\text{length}][\text{level}]
+$$
+
+**Example Calculations:**
+
+1. **Extreme 3+ on a WTF map:**
+
+$$
+\text{level} = 16, \, \text{length} = 9, \, \text{matrix}[9][16] = 0.0914 \\
+\text{probability} = \left( \frac{\text{16}}{\text{16}} \cdot \text{0.6} \right) 
++ \left( \frac{\text{9}}{\text{9}} \cdot \text{0.4} \right)
+\cdot 0.0914 \\
+= 1 \cdot 0.6 + 1 \cdot 0.4 \cdot 0.0914 \\
+= 0.6 + 0.03656 = 0.63656 \cdot 100 = 63.66\%
+$$
+
+2. **Easy 1 on a XXS map:**
+
+$$
+\text{level} = 1, \, \text{length} = 1, \, \text{matrix}[1][1] = 0.0198 \\
+\text{probability} = \left( \frac{\text{1}}{\text{16}} \cdot \text{0.6} \right) 
++ \left( \frac{\text{1}}{\text{9}} \cdot \text{0.4} \right)
+\cdot 0.0198 \\
+= 0.0625 \cdot 0.6 + 0.1111 \cdot 0.4 \cdot 0.0198 \\
+= 0.0375 + 0.00087912 = 0.03838 \cdot 100 = 3.84\%
+$$
 
 <details>
   <summary>Show Formula</summary>
 
-  The probability is calculated by the following formula:
-
-  $$
-  \text{max\_levels} = 16 \\
-  \text{max\_length} = 9 \\
-  \text{level\_weight} = 0.6 \, (60\%) \\
-  \text{length\_weight} = 0.4 \, (40\%) \\
-  \text{matrix}[\text{length}][\text{level}] \, \text{retrieved from the table}
-  $$
-
-  **Probability Formula:**
-
-  $$
-  \text{probability} = \left( \left( \frac{\text{level}}{\text{max\_levels}} \cdot \text{level\_weight} \right)
-  + \left( \frac{\text{length}}{\text{max\_length}} \right) \cdot \text{length\_weight} \right)
-  \times \text{matrix}[\text{length}][\text{level}]
-  $$
-
-  **Example Calculations:**
-
-  1. **Extreme 3+ on a WTF map:**
-
-  $$
-  \text{level} = 16, \, \text{length} = 9, \, \text{matrix}[9][16] = 0.0914 \\
-  \text{probability} = \left( \left( \frac{\text{16}}{\text{16}} \cdot \text{0.6} \right) 
-  + \left( \frac{\text{9}}{\text{9}} \cdot \text{0.4} \right) \right)
-  \cdot 0.0914 \\
-  = \left( 1 \cdot 0.6 + 1 \cdot 0.4 \right) \cdot 0.0914 \\
-  = 1 \cdot 0.0914 = 0.0914 \cdot 100 = 9,14\%
-  $$
-
-  2. **Easy 1 on a XXS map:**
-
-  $$
-  \text{level} = 1, \, \text{length} = 1, \, \text{matrix}[1][1] = 0.0198 \\
-  \text{probability} = \left( \left( \frac{\text{1}}{\text{16}} \cdot \text{0.6} \right) 
-  + \left( \frac{\text{1}}{\text{9}} \cdot \text{0.4} \right) \right)
-  \cdot 0.0198 \\
-  = \left( \left( 0.0625 \cdot 0.6 \right) + \left( 0.1111 \cdot 0.4 \right) \right) \cdot 0.0198 \\
-  = 0.08194 \cdot 0.0198 = 0.001622 \cdot 100 = 0.1\%
-  $$
-</details>
-
-<details>
-  <summary>Show Map Event Probability Matrix</summary>
-
-  **ATTENTION**: The matrix levels have been reversed to make it easier to read. There is no mathematical expression, the values are purely based on random numbers between a specific threshold.
+  **ATTENTION**: The matrix levels have been reversed to make it easier to read.
 
   | Level      | EASY 1 | EASY 2 | EASY 3 | MAIN 1 | MAIN 2 | MAIN 3 | HARD 1 | HARD 2 | HARD 3 | INSANE 1 | INSANE 2 | INSANE 3 | EXTREME 1 | EXTREME 2 | EXTREME 3 | EXTREME 3+ |
   |------------|--------|--------|--------|--------|--------|--------|--------|--------|--------|----------|----------|----------|-----------|-----------|-----------|------------|
@@ -119,45 +75,6 @@ It is possible that multiple MapEvents are on a map.
   | **XS**     | 0.0158 | 0.0223 | 0.0287 | 0.0351 | 0.0416 | 0.0480 | 0.0545 | 0.0609 | 0.0674 | 0.0738   | 0.0803   | 0.0859   | 0.0859    | 0.0859    | 0.0859    | 0.0860     |
   | **XXS**    | 0.0198 | 0.0257 | 0.0317 | 0.0376 | 0.0436 | 0.0495 | 0.0554 | 0.0614 | 0.0673 | 0.0733   | 0.0792   | 0.0791   | 0.0791    | 0.0791    | 0.0791    | 0.0792     |
 </details>
-
-<details>
-  <summary>Implementation detail</summary>
-
-  ```python title="Python implementation"
-    import random
-
-    PROBABILITY_MATRIX = [
-      [0.0198, 0.0257, 0.0317, 0.0376, 0.0436, ..., 0.0791, 0.0792],
-      ...,
-      [0.0126, 0.0194, 0.0263, ..., 0.0913, 0.0913, 0.0914]
-    ]
-    MAX_LEVEL = 16
-    LEVEL_WEIGHT = 0.6
-
-    MAX_DIFFICULTY = 9
-    DIFFICULTY_WEIGHT = 0.4
-
-    # For demonstration purpose, no out of bound checks are performed
-    def trigger_event(level: int, difficulty: int):
-        # Look up the probability
-        probability_multiplier = PROBABILITY_MATRIX[level][difficulty]
-        level_multiplier = (level / MAX_LEVEL) * LEVEL_WEIGHT
-        difficulty_multiplier = (difficulty / MAX_DIFFICULTY) * DIFFICULTY_WEIGHT
-
-        probabilty = (level_multiplier + difficulty_multiplier) * probability_multiplier
-        
-        # Check if the event should be triggered
-        if random.random() <= probability:
-            return True
-        else:
-            return False
-  ```
-
-</details>
-
-### <Badge text="New - For Server Providers" variant="note" />Rewrote DNSBL public api
-
-We have rewritten the DNSBL public API to be more efficient and faster. You dont need to change anything, the old DNSBL will be redirected to the new system. If you encounter any issues, please report them to us.
 
 ### <Badge text="Change" variant="tip" /> Changes
 - `/power` now shows the remaining time until it can be used again. [KoG-teeworlds/community#25](https://github.com/KoG-teeworlds/community/issues/25)
