@@ -1,67 +1,68 @@
 table {
-    width: 100%;
-    border-collapse: collapse;
-    font-family: Arial, sans-serif;
+  width: 100%;
+  border-collapse: collapse;
+  font-family: Arial, sans-serif;
 }
-th, td {
-    border: 1px solid #2c2c2c;
-    text-align: center;
-    padding: 8px;
+th,
+td {
+  border: 1px solid #2c2c2c;
+  text-align: center;
+  padding: 8px;
 }
 th {
-    background-color: #1f1f1f;
-    color: #ffffff;
-    position: sticky;
-    top: 0;
-    z-index: 2;
+  background-color: #1f1f1f;
+  color: #ffffff;
+  position: sticky;
+  top: 0;
+  z-index: 2;
 }
 .tooltip {
-    display: inline-block;
-    position: relative;
-    cursor: pointer;
-    margin-left: 5px;
-    font-size: 14px;
-    color: #ffffff;
-    background-color: #444;
-    border-radius: 50%;
-    width: 16px;
-    height: 16px;
-    line-height: 16px;
-    text-align: center;
+  display: inline-block;
+  position: relative;
+  cursor: pointer;
+  margin-left: 5px;
+  font-size: 14px;
+  color: #ffffff;
+  background-color: #444;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  line-height: 16px;
+  text-align: center;
 }
 .tooltip:hover::after {
-    content: attr(data-tooltip);
-    position: absolute;
-    bottom: 120%;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: #333;
-    color: #fff;
-    padding: 5px;
-    border-radius: 5px;
-    white-space: nowrap;
-    font-size: 12px;
-    z-index: 10;
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 120%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #333;
+  color: #fff;
+  padding: 5px;
+  border-radius: 5px;
+  white-space: nowrap;
+  font-size: 12px;
+  z-index: 10;
 }
 .tooltip:hover::before {
-    content: '';
-    position: absolute;
-    bottom: 110%;
-    left: 50%;
-    transform: translateX(-50%);
-    border-width: 5px;
-    border-style: solid;
-    border-color: transparent transparent #333 transparent;
+  content: "";
+  position: absolute;
+  bottom: 110%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 5px;
+  border-style: solid;
+  border-color: transparent transparent #333 transparent;
 }
 tr:nth-child(even) {
-    background-color: #2a2a2a;
+  background-color: #2a2a2a;
 }
 tr:nth-child(odd) {
-    background-color: #1e1e1e;
+  background-color: #1e1e1e;
 }
 .highlight {
-    background-color: #3e9725;
+  background-color: #3e9725;
 }
 tbody {
-    overflow-y: auto;
+  overflow-y: auto;
 }

@@ -7,6 +7,7 @@ import rehypeKatex from "rehype-katex";
 
 // https://astro.build/config
 export default defineConfig({
+  site: "https://community.kog.tw",
   vite: {
     build: {
       modulePreload: true,
@@ -22,20 +23,31 @@ export default defineConfig({
   integrations: [
     starlight({
       title: "KoG Community",
-      customCss: ["./src/styles/custom.css", "./src/styles/mathjax.css"],
+      customCss: ["./src/styles/custom.css"],
       components: {},
       favicon: "/tee_light.svg",
       logo: {
         dark: "./src/assets/brand/tee_light.svg",
         light: "./src/assets/brand/tee_dark.svg",
       },
-      social: {
-        discord: "https://discord.kog.tw",
-        github: "https://github.com/KoG-teeworlds/community",
-      },
+      social: [
+        { icon: "discord", label: "Discord", href: "https://discord.kog.tw" },
+        {
+          icon: "github",
+          label: "Github",
+          href: "https://github.com/KoG-teeworlds/community",
+        },
+      ],
       plugins: [
         starlightBlog({
-          authors: {},
+          authors: {
+            avolicious: {
+              name: "Avolicious",
+              title: "Project Maintainer",
+              picture: "authors/avolicious.webp",
+              url: "https://kog.tw",
+            },
+          },
         }),
       ],
       defaultLocale: "root",
