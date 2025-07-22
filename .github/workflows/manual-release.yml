@@ -22,7 +22,7 @@ on:
       blog_folder:
         description: "Blog folder path (e.g., content/blog, posts, articles)"
         required: true
-        default: "content/blog"
+        default: "src/content/docs/blog"
         type: string
       target_environment:
         description: "Target Environment"
