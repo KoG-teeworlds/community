@@ -1,0 +1,213 @@
+name: Automated Release Management
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  trigger-merge-requests:
+    runs-on: ubuntu-latest
+    if: github.actor == 'Avolicious'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Determine merge direction
+        id: merge_direction
+        run: |
+          if [[ "${{ github.event.release.prerelease }}" == "true" ]]; then
+            echo "source_branch=dev" >> $GITHUB_OUTPUT
+            echo "target_branch=beta" >> $GITHUB_OUTPUT
+            echo "merge_type=pre-release" >> $GITHUB_OUTPUT
+          else
+            echo "source_branch=beta" >> $GITHUB_OUTPUT
+            echo "target_branch=main" >> $GITHUB_OUTPUT
+            echo "merge_type=release" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Get repository list
+        id: repos
+        run: |
+          repos='[
+            "KoG-teeworlds/temp_backend",
+            "KoG-teeworlds/kog-2.0-server",
+            "KoG-teeworlds/api-ws-rs",
+            "KoG-teeworlds/geoip-service",
+            "KoG-teeworlds/ws-client-rs",
+            "KoG-teeworlds/edgeservice",
+            "KoG-teeworlds/profanity-service",
+            "KoG-teeworlds/ip-intel-api"
+          ]'
+          echo "repositories=$repos" >> $GITHUB_OUTPUT
+
+      - name: Create pull requests in all repositories
+        env:
+          GITHUB_TOKEN: ${{ secrets.CROSS_REPO_TOKEN }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+          RELEASE_URL: ${{ github.event.release.html_url }}
+          RELEASE_BODY: ${{ github.event.release.body }}
+        run: |
+          repositories='${{ steps.repos.outputs.repositories }}'
+          source_branch='${{ steps.merge_direction.outputs.source_branch }}'
+          target_branch='${{ steps.merge_direction.outputs.target_branch }}'
+          merge_type='${{ steps.merge_direction.outputs.merge_type }}'
+
+          echo "Creating $merge_type pull requests: $source_branch → $target_branch"
+
+          # Initialize summary arrays
+          successful_prs=()
+          failed_repos=()
+          updated_prs=()
+
+          # Process each repository
+          echo "$repositories" | jq -r '.[]' | while read repo; do
+            echo "Processing repository: $repo"
+
+            # Check if branches exist
+            source_exists=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
+              "https://api.github.com/repos/$repo/branches/$source_branch" | jq -r '.name // empty')
+            target_exists=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
+              "https://api.github.com/repos/$repo/branches/$target_branch" | jq -r '.name // empty')
+
+            if [[ -z "$source_exists" ]] || [[ -z "$target_exists" ]]; then
+              echo "❌ Missing branches in $repo (source: $source_exists, target: $target_exists)"
+              echo "$repo|missing_branches" >> /tmp/failed_repos.txt
+              continue
+            fi
+
+            # Check for existing pull request
+            existing_pr=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
+              "https://api.github.com/repos/$repo/pulls?base=$target_branch&head=$source_branch&state=open" | \
+              jq -r '.[0].number // empty')
+
+            # Create PR title and body
+            if [[ "$merge_type" == "pre-release" ]]; then
+              pr_title="🚀 Pre-release: Merge $source_branch → $target_branch ($RELEASE_TAG)"
+              pr_body="## 🚀 Automated Pre-release Merge
+
+              This pull request was automatically created for the pre-release \`$RELEASE_TAG\`.
+
+              **Source:** \`$source_branch\`
+              **Target:** \`$target_branch\`
+              **Release:** [$RELEASE_TAG]($RELEASE_URL)
+
+              ### 📋 Release Notes
+              $RELEASE_BODY
+
+              ---
+              *This PR was created automatically from [${{ github.repository }}](${{ github.server_url }}/${{ github.repository }}). Please review the changes before merging.*"
+                      else
+                        pr_title="🎉 Release: Merge $source_branch → $target_branch ($RELEASE_TAG)"
+                        pr_body="## 🎉 Automated Release Merge
+
+              This pull request was automatically created for the release \`$RELEASE_TAG\`.
+
+              **Source:** \`$source_branch\`
+              **Target:** \`$target_branch\`
+              **Release:** [$RELEASE_TAG]($RELEASE_URL)
+
+              ### 📋 Release Notes
+              $RELEASE_BODY
+
+              ---
+              *This PR was created automatically from [${{ github.repository }}](${{ github.server_url }}/${{ github.repository }}). Please review the changes before merging.*"
+            fi
+
+            if [[ -n "$existing_pr" ]]; then
+              # Update existing PR with comment
+              echo "Updating existing PR #$existing_pr in $repo"
+              comment_body="🔄 **Update:** This PR is now associated with $merge_type [\`$RELEASE_TAG\`]($RELEASE_URL)
+
+              $RELEASE_BODY"
+
+              curl -s -X POST \
+                -H "Authorization: token $GITHUB_TOKEN" \
+                -H "Accept: application/vnd.github.v3+json" \
+                "https://api.github.com/repos/$repo/issues/$existing_pr/comments" \
+                -d "{\"body\": $(echo "$comment_body" | jq -Rs .)}" > /dev/null
+
+              echo "$repo|$existing_pr|updated" >> /tmp/updated_prs.txt
+            else
+              # Create new pull request
+              echo "Creating new PR in $repo"
+              response=$(curl -s -X POST \
+                -H "Authorization: token $GITHUB_TOKEN" \
+                -H "Accept: application/vnd.github.v3+json" \
+                "https://api.github.com/repos/$repo/pulls" \
+                -d "{
+                  \"title\": $(echo "$pr_title" | jq -Rs .),
+                  \"body\": $(echo "$pr_body" | jq -Rs .),
+                  \"head\": \"$source_branch\",
+                  \"base\": \"$target_branch\"
+                }")
+
+              pr_number=$(echo "$response" | jq -r '.number // empty')
+              pr_url=$(echo "$response" | jq -r '.html_url // empty')
+              error_message=$(echo "$response" | jq -r '.message // empty')
+
+              if [[ -n "$pr_number" ]] && [[ "$pr_number" != "null" ]]; then
+                echo "✅ Created PR #$pr_number in $repo"
+
+                # Assign PR to the user who triggered the release
+                curl -s -X POST \
+                  -H "Authorization: token $GITHUB_TOKEN" \
+                  -H "Accept: application/vnd.github.v3+json" \
+                  "https://api.github.com/repos/$repo/issues/$pr_number/assignees" \
+                  -d "{\"assignees\": [\"${{ github.actor }}\"]}" > /dev/null
+
+                echo "$repo|$pr_number|$pr_url" >> /tmp/successful_prs.txt
+              else
+                echo "❌ Failed to create PR in $repo: $error_message"
+                echo "$repo|$error_message" >> /tmp/failed_repos.txt
+              fi
+            fi
+
+            # Small delay to avoid rate limiting
+            sleep 1
+          done
+
+          # Create job summary
+          echo "## 🚀 Automated $merge_type Process Completed" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Merge Direction:** \`$source_branch\` → \`$target_branch\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Release:** [$RELEASE_TAG]($RELEASE_URL)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Successful PRs
+          if [[ -f /tmp/successful_prs.txt ]]; then
+            echo "### ✅ Pull Requests Created:" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            while IFS='|' read -r repo pr_number pr_url; do
+              echo "- **$repo**: [PR #$pr_number]($pr_url)" >> $GITHUB_STEP_SUMMARY
+            done < /tmp/successful_prs.txt
+            echo "" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          # Updated PRs
+          if [[ -f /tmp/updated_prs.txt ]]; then
+            echo "### 🔄 Pull Requests Updated:" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            while IFS='|' read -r repo pr_number status; do
+              echo "- **$repo**: [PR #$pr_number](https://github.com/$repo/pull/$pr_number) - Release information added" >> $GITHUB_STEP_SUMMARY
+            done < /tmp/updated_prs.txt
+            echo "" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          # Failed repos
+          if [[ -f /tmp/failed_repos.txt ]]; then
+            echo "### ❌ Issues Encountered:" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            while IFS='|' read -r repo error; do
+              if [[ "$error" == "missing_branches" ]]; then
+                echo "- **$repo**: Missing required branches (\`$source_branch\` or \`$target_branch\`)" >> $GITHUB_STEP_SUMMARY
+              else
+                echo "- **$repo**: $error" >> $GITHUB_STEP_SUMMARY
+              fi
+            done < /tmp/failed_repos.txt
+            echo "" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "---" >> $GITHUB_STEP_SUMMARY
+          echo "💡 **Next Steps:** Review and merge the pull requests in each repository." >> $GITHUB_STEP_SUMMARY
