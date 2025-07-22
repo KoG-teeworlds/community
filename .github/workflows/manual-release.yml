@@ -1,0 +1,536 @@
+name: Manual Release Management with Blog Post
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_type:
+        description: "Release Type"
+        required: true
+        default: "pre-release"
+        type: choice
+        options:
+          - pre-release
+          - release
+      version:
+        description: "Version (e.g., 2.1.0, 2.1.0-beta.1)"
+        required: true
+        type: string
+      title:
+        description: "Release Title"
+        required: true
+        type: string
+      blog_folder:
+        description: "Blog folder path (e.g., content/blog, posts, articles)"
+        required: true
+        default: "content/blog"
+        type: string
+      target_environment:
+        description: "Target Environment"
+        required: true
+        type: choice
+        options:
+          - beta
+          - production
+        default: "beta"
+
+jobs:
+  create-release-workflow:
+    runs-on: ubuntu-latest
+    if: github.actor == 'Avolicious'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.CROSS_REPO_TOKEN }}
+
+      - name: Configure Git
+        run: |
+          git config user.name "Release Bot"
+          git config user.email "${{ github.actor }}@users.noreply.github.com"
+
+      - name: Determine release configuration
+        id: config
+        run: |
+          release_type="${{ github.event.inputs.release_type }}"
+          target_env="${{ github.event.inputs.target_environment }}"
+
+          # Determine source and target branches based on inputs
+          if [[ "$release_type" == "pre-release" ]]; then
+            source_branch="dev"
+            target_branch="beta"
+            blog_type="pre-release"
+            icon="🚀"
+          else
+            source_branch="beta"
+            target_branch="main"
+            blog_type="release"
+            icon="🎉"
+          fi
+
+          # Override target branch if specific environment requested
+          if [[ "$target_env" == "production" ]]; then
+            target_branch="main"
+            source_branch="beta"
+          elif [[ "$target_env" == "beta" ]]; then
+            target_branch="beta"
+            source_branch="dev"
+          fi
+
+          # Create blog post filename
+          version="${{ github.event.inputs.version }}"
+          clean_version=$(echo "$version" | sed 's/[^a-zA-Z0-9.-]//g')
+          date=$(date +%Y-%m-%d)
+          blog_filename="${date}-${blog_type}-${clean_version}.md"
+          branch_name="blog/${blog_type}-${clean_version}"
+
+          echo "source_branch=$source_branch" >> $GITHUB_OUTPUT
+          echo "target_branch=$target_branch" >> $GITHUB_OUTPUT
+          echo "blog_type=$blog_type" >> $GITHUB_OUTPUT
+          echo "icon=$icon" >> $GITHUB_OUTPUT
+          echo "blog_filename=$blog_filename" >> $GITHUB_OUTPUT
+          echo "branch_name=$branch_name" >> $GITHUB_OUTPUT
+          echo "clean_version=$clean_version" >> $GITHUB_OUTPUT
+
+      - name: Create blog post branch and file
+        id: blog_post
+        env:
+          BLOG_FOLDER: ${{ github.event.inputs.blog_folder }}
+          VERSION: ${{ github.event.inputs.version }}
+          TITLE: ${{ github.event.inputs.title }}
+          RELEASE_TYPE: ${{ github.event.inputs.release_type }}
+        run: |
+          branch_name="${{ steps.config.outputs.branch_name }}"
+          blog_filename="${{ steps.config.outputs.blog_filename }}"
+          blog_type="${{ steps.config.outputs.blog_type }}"
+          icon="${{ steps.config.outputs.icon }}"
+
+          # Create new branch for blog post
+          git checkout -b "$branch_name"
+
+          # Ensure blog directory exists
+          mkdir -p "$BLOG_FOLDER"
+
+          # Create blog post content
+          blog_path="$BLOG_FOLDER/$blog_filename"
+
+          cat > "$blog_path" << EOF
+          ---
+          title: "$icon $TITLE"
+          date: $(date +%Y-%m-%d)
+          version: "$VERSION"
+          type: "$blog_type"
+          draft: true
+          tags:
+            - release
+            - $blog_type
+            - v$VERSION
+          ---
+
+          # $icon $TITLE
+
+          We're excited to announce the $RELEASE_TYPE of version **$VERSION**!
+
+          ## 🌟 What's New
+
+          ### 🚀 New Features
+          - [ ] Add new feature descriptions here
+          - [ ] Feature 2
+          - [ ] Feature 3
+
+          ### 🐛 Bug Fixes
+          - [ ] Add bug fix descriptions here
+          - [ ] Bug fix 2
+          - [ ] Bug fix 3
+
+          ### 🔧 Improvements
+          - [ ] Add improvement descriptions here
+          - [ ] Improvement 2
+          - [ ] Improvement 3
+
+          ### ⚠️ Breaking Changes
+          - [ ] List any breaking changes here
+          - [ ] Breaking change 2
+
+          ## 📦 Deployment Status
+
+          This $blog_type affects the following repositories:
+
+          <!-- AUTOMATED_REPO_LINKS_START -->
+          *Repository links will be automatically populated when cross-repo PRs are created.*
+          <!-- AUTOMATED_REPO_LINKS_END -->
+
+          ## 🚀 How to Update
+
+          ### For Developers
+          \`\`\`bash
+          git pull origin ${{ steps.config.outputs.target_branch }}
+          # Follow specific update instructions for your repository
+          \`\`\`
+
+          ### For Users
+          [Add user-facing update instructions here]
+
+          ## 📋 Migration Guide
+
+          [Add migration instructions if needed]
+
+          ## 🤝 Thanks
+
+          Thanks to all contributors who made this release possible!
+
+          ---
+
+          **Release Notes**: This is an automated $blog_type post. Please update the content above with specific details about this release.
+          EOF
+
+          # Add and commit the blog post
+          git add "$blog_path"
+          git commit -m "$icon Create $blog_type blog post for v$VERSION"
+          git push origin "$branch_name"
+
+          echo "blog_path=$blog_path" >> $GITHUB_OUTPUT
+          echo "branch_created=$branch_name" >> $GITHUB_OUTPUT
+
+          echo "✅ Created blog post at $blog_path on branch $branch_name"
+
+      - name: Get repository list
+        id: repos
+        run: |
+          # Define your repositories here
+          repos='[
+            "KoG-teeworlds/temp_backend",
+            "KoG-teeworlds/kog-2.0-server",
+            "KoG-teeworlds/api-ws-rs",
+            "KoG-teeworlds/geoip-service",
+            "KoG-teeworlds/ws-client-rs",
+            "KoG-teeworlds/edgeservice",
+            "KoG-teeworlds/profanity-service",
+            "KoG-teeworlds/ip-intel-api"
+          ]'
+          echo "repositories=$repos" >> $GITHUB_OUTPUT
+
+      - name: Create pull requests in all repositories
+        id: create_prs
+        env:
+          GITHUB_TOKEN: ${{ secrets.CROSS_REPO_TOKEN }}
+          VERSION: ${{ github.event.inputs.version }}
+          TITLE: ${{ github.event.inputs.title }}
+          RELEASE_TYPE: ${{ github.event.inputs.release_type }}
+          TARGET_ENV: ${{ github.event.inputs.target_environment }}
+        run: |
+          repositories='${{ steps.repos.outputs.repositories }}'
+          source_branch='${{ steps.config.outputs.source_branch }}'
+          target_branch='${{ steps.config.outputs.target_branch }}'
+          blog_type='${{ steps.config.outputs.blog_type }}'
+          icon='${{ steps.config.outputs.icon }}'
+          blog_branch='${{ steps.blog_post.outputs.branch_created }}'
+
+          echo "Creating $blog_type pull requests: $source_branch → $target_branch"
+
+          # Initialize summary files
+          touch /tmp/successful_prs.txt
+          touch /tmp/failed_repos.txt
+          touch /tmp/updated_prs.txt
+
+          # Store PR links for blog post update
+          repo_links=""
+
+          # Process each repository
+          echo "$repositories" | jq -r '.[]' | while read repo; do
+            echo "Processing repository: $repo"
+
+            # Check if branches exist
+            source_exists=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
+              "https://api.github.com/repos/$repo/branches/$source_branch" | jq -r '.name // empty')
+            target_exists=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
+              "https://api.github.com/repos/$repo/branches/$target_branch" | jq -r '.name // empty')
+
+            if [[ -z "$source_exists" ]] || [[ -z "$target_exists" ]]; then
+              echo "❌ Missing branches in $repo (source: $source_exists, target: $target_exists)"
+              echo "$repo|missing_branches" >> /tmp/failed_repos.txt
+              continue
+            fi
+
+            # Check for existing pull request
+            existing_pr=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
+              "https://api.github.com/repos/$repo/pulls?base=$target_branch&head=$source_branch&state=open" | \
+              jq -r '.[0].number // empty')
+
+            # Create PR title and body
+            pr_title="$icon $blog_type: $TITLE (v$VERSION)"
+            pr_body="## $icon $blog_type: $TITLE
+
+            **Version:** \`$VERSION\`
+            **Environment:** \`$TARGET_ENV\`
+            **Source:** \`$source_branch\` → **Target:** \`$target_branch\`
+
+            ### 📝 Release Blog Post
+            This release is documented in the main repository blog post. The blog post will be updated with links to all related PRs once they are created.
+
+            **Blog Branch:** [\`$blog_branch\`](https://github.com/${{ github.repository }}/tree/$blog_branch)
+
+            ### 🚀 What's Included
+            This automated PR merges the latest changes from \`$source_branch\` to \`$target_branch\` as part of the **$VERSION** $blog_type process.
+
+            ### ✅ Pre-merge Checklist
+            - [ ] Review all changes in this PR
+            - [ ] Verify tests are passing
+            - [ ] Check that deployment configurations are correct
+            - [ ] Ensure documentation is up to date
+            - [ ] Confirm this aligns with the release blog post
+
+            ### 🔗 Related Links
+            - **Main Repository:** [${{ github.repository }}](https://github.com/${{ github.repository }})
+            - **Release Workflow:** [View Workflow Run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+
+            ---
+            *This PR was created automatically via manual release trigger by @${{ github.actor }}*"
+
+                      if [[ -n "$existing_pr" ]]; then
+                        # Update existing PR with comment
+                        echo "Updating existing PR #$existing_pr in $repo"
+                        comment_body="🔄 **Updated for $blog_type v$VERSION**
+
+            This PR has been updated as part of the $TITLE release process.
+
+            **Blog Branch:** [\`$blog_branch\`](https://github.com/${{ github.repository }}/tree/$blog_branch)
+            **Workflow Run:** [View Details](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
+
+              curl -s -X POST \
+                -H "Authorization: token $GITHUB_TOKEN" \
+                -H "Accept: application/vnd.github.v3+json" \
+                "https://api.github.com/repos/$repo/issues/$existing_pr/comments" \
+                -d "{\"body\": $(echo "$comment_body" | jq -Rs .)}" > /dev/null
+
+              echo "$repo|$existing_pr|updated|https://github.com/$repo/pull/$existing_pr" >> /tmp/updated_prs.txt
+              repo_links="$repo_links- **$repo**: [PR #$existing_pr](https://github.com/$repo/pull/$existing_pr) *(updated)*"$'\n'
+            else
+              # Create new pull request
+              echo "Creating new PR in $repo"
+              response=$(curl -s -X POST \
+                -H "Authorization: token $GITHUB_TOKEN" \
+                -H "Accept: application/vnd.github.v3+json" \
+                "https://api.github.com/repos/$repo/pulls" \
+                -d "{
+                  \"title\": $(echo "$pr_title" | jq -Rs .),
+                  \"body\": $(echo "$pr_body" | jq -Rs .),
+                  \"head\": \"$source_branch\",
+                  \"base\": \"$target_branch\"
+                }")
+
+              pr_number=$(echo "$response" | jq -r '.number // empty')
+              pr_url=$(echo "$response" | jq -r '.html_url // empty')
+              error_message=$(echo "$response" | jq -r '.message // empty')
+
+              if [[ -n "$pr_number" ]] && [[ "$pr_number" != "null" ]]; then
+                echo "✅ Created PR #$pr_number in $repo"
+
+                # Assign PR to the user who triggered the automation
+                curl -s -X POST \
+                  -H "Authorization: token $GITHUB_TOKEN" \
+                  -H "Accept: application/vnd.github.v3+json" \
+                  "https://api.github.com/repos/$repo/issues/$pr_number/assignees" \
+                  -d "{\"assignees\": [\"${{ github.actor }}\"]}" > /dev/null
+
+                echo "$repo|$pr_number|$pr_url" >> /tmp/successful_prs.txt
+                repo_links="$repo_links- **$repo**: [PR #$pr_number]($pr_url)"$'\n'
+              else
+                echo "❌ Failed to create PR in $repo: $error_message"
+                echo "$repo|$error_message" >> /tmp/failed_repos.txt
+                repo_links="$repo_links- **$repo**: ❌ Failed to create PR - $error_message"$'\n'
+              fi
+            fi
+
+            # Small delay to avoid rate limiting
+            sleep 1
+          done
+
+          # Save repo links for blog post update
+          echo "$repo_links" > /tmp/repo_links.txt
+
+      - name: Update blog post with repository links
+        env:
+          GITHUB_TOKEN: ${{ secrets.CROSS_REPO_TOKEN }}
+        run: |
+          blog_path="${{ steps.blog_post.outputs.blog_path }}"
+          blog_branch="${{ steps.blog_post.outputs.branch_created }}"
+
+          # Switch to blog branch
+          git checkout "$blog_branch"
+
+          # Read the repository links
+          if [[ -f /tmp/repo_links.txt ]]; then
+            repo_links=$(cat /tmp/repo_links.txt)
+
+            # Update blog post with repository links
+            if [[ -n "$repo_links" ]]; then
+              # Replace the placeholder with actual links
+              sed -i '/<!-- AUTOMATED_REPO_LINKS_START -->/,/<!-- AUTOMATED_REPO_LINKS_END -->/{
+                /<!-- AUTOMATED_REPO_LINKS_START -->/!{
+                  /<!-- AUTOMATED_REPO_LINKS_END -->/!d
+                }
+              }' "$blog_path"
+
+              # Insert the new content
+              sed -i "/<!-- AUTOMATED_REPO_LINKS_START -->/a\\
+              $repo_links" "$blog_path"
+
+              # Commit the update
+              git add "$blog_path"
+              git commit -m "📝 Update blog post with repository PR links"
+              git push origin "$blog_branch"
+
+              echo "✅ Updated blog post with repository links"
+            fi
+          fi
+
+      - name: Create main repository PR
+        id: main_pr
+        env:
+          GITHUB_TOKEN: ${{ secrets.CROSS_REPO_TOKEN }}
+          VERSION: ${{ github.event.inputs.version }}
+          TITLE: ${{ github.event.inputs.title }}
+        run: |
+          blog_branch="${{ steps.blog_post.outputs.branch_created }}"
+          blog_filename="${{ steps.config.outputs.blog_filename }}"
+          blog_type="${{ steps.config.outputs.blog_type }}"
+          icon="${{ steps.config.outputs.icon }}"
+          target_env="${{ github.event.inputs.target_environment }}"
+
+          # Create PR for the blog post
+          pr_title="$icon Add $blog_type blog post: $TITLE (v$VERSION)"
+          pr_body="## $icon $blog_type Blog Post: $TITLE
+
+          This PR adds the blog post for the **$VERSION** $blog_type and coordinates cross-repository deployments.
+
+          ### 📝 Blog Post Details
+          - **File:** \`${{ github.event.inputs.blog_folder }}/$blog_filename\`
+          - **Version:** \`$VERSION\`
+          - **Environment:** \`$target_env\`
+          - **Type:** \`$blog_type\`
+
+          ### 🚀 Cross-Repository Status
+          The following repositories have been updated with corresponding PRs:
+
+          $(cat /tmp/repo_links.txt)
+
+          ### ✅ Release Checklist
+          - [x] Blog post created with release details
+          - [x] Cross-repository PRs created
+          - [ ] Review blog post content and update with specific changes
+          - [ ] Review and merge cross-repository PRs
+          - [ ] Merge this PR to publish the blog post
+          - [ ] Announce the release
+
+          ### 🔗 Workflow Information
+          - **Triggered by:** @${{ github.actor }}
+          - **Workflow Run:** [View Details](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          - **Target Environment:** \`$target_env\`
+
+          ---
+          *This PR centralizes the $blog_type process and provides links to all related repository changes.*"
+
+          response=$(curl -s -X POST \
+            -H "Authorization: token $GITHUB_TOKEN" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "https://api.github.com/repos/${{ github.repository }}/pulls" \
+            -d "{
+              \"title\": $(echo "$pr_title" | jq -Rs .),
+              \"body\": $(echo "$pr_body" | jq -Rs .),
+              \"head\": \"$blog_branch\",
+              \"base\": \"main\"
+            }")
+
+          pr_number=$(echo "$response" | jq -r '.number // empty')
+          pr_url=$(echo "$response" | jq -r '.html_url // empty')
+
+          if [[ -n "$pr_number" ]] && [[ "$pr_number" != "null" ]]; then
+            echo "main_pr_number=$pr_number" >> $GITHUB_OUTPUT
+            echo "main_pr_url=$pr_url" >> $GITHUB_OUTPUT
+            echo "✅ Created main repository PR #$pr_number"
+          else
+            echo "❌ Failed to create main repository PR"
+          fi
+
+      - name: Create comprehensive summary
+        env:
+          VERSION: ${{ github.event.inputs.version }}
+          TITLE: ${{ github.event.inputs.title }}
+        run: |
+          blog_type="${{ steps.config.outputs.blog_type }}"
+          icon="${{ steps.config.outputs.icon }}"
+          source_branch="${{ steps.config.outputs.source_branch }}"
+          target_branch="${{ steps.config.outputs.target_branch }}"
+          target_env="${{ github.event.inputs.target_environment }}"
+          main_pr_url="${{ steps.main_pr.outputs.main_pr_url }}"
+          blog_branch="${{ steps.blog_post.outputs.branch_created }}"
+
+          echo "# $icon $blog_type Process Completed: $TITLE" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Version:** \`$VERSION\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Environment:** \`$target_env\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Merge Direction:** \`$source_branch\` → \`$target_branch\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Main PR link
+          if [[ -n "$main_pr_url" ]]; then
+            echo "## 📝 Main Blog Post PR" >> $GITHUB_STEP_SUMMARY
+            echo "**[Review and merge the blog post PR]($main_pr_url)**" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "This PR contains:" >> $GITHUB_STEP_SUMMARY
+            echo "- New blog post for the $blog_type" >> $GITHUB_STEP_SUMMARY
+            echo "- Links to all cross-repository PRs" >> $GITHUB_STEP_SUMMARY
+            echo "- Release coordination details" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          # Blog post details
+          echo "## 📄 Blog Post Created" >> $GITHUB_STEP_SUMMARY
+          echo "- **Branch:** [\`$blog_branch\`](https://github.com/${{ github.repository }}/tree/$blog_branch)" >> $GITHUB_STEP_SUMMARY
+          echo "- **File:** \`${{ github.event.inputs.blog_folder }}/${{ steps.config.outputs.blog_filename }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Cross-repo PRs
+          if [[ -s /tmp/successful_prs.txt ]]; then
+            echo "## ✅ Cross-Repository PRs Created" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            while IFS='|' read -r repo pr_number pr_url; do
+              echo "- **$repo**: [PR #$pr_number]($pr_url)" >> $GITHUB_STEP_SUMMARY
+            done < /tmp/successful_prs.txt
+            echo "" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          # Updated PRs
+          if [[ -s /tmp/updated_prs.txt ]]; then
+            echo "## 🔄 Cross-Repository PRs Updated" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            while IFS='|' read -r repo pr_number status pr_url; do
+              echo "- **$repo**: [PR #$pr_number]($pr_url) - Updated with $blog_type details" >> $GITHUB_STEP_SUMMARY
+            done < /tmp/updated_prs.txt
+            echo "" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          # Failed repos
+          if [[ -s /tmp/failed_repos.txt ]]; then
+            echo "## ❌ Issues Encountered" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            while IFS='|' read -r repo error; do
+              if [[ "$error" == "missing_branches" ]]; then
+                echo "- **$repo**: Missing required branches (\`$source_branch\` or \`$target_branch\`)" >> $GITHUB_STEP_SUMMARY
+              else
+                echo "- **$repo**: $error" >> $GITHUB_STEP_SUMMARY
+              fi
+            done < /tmp/failed_repos.txt
+            echo "" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## 🎯 Next Steps" >> $GITHUB_STEP_SUMMARY
+          echo "1. **Review the blog post** and update with specific release details" >> $GITHUB_STEP_SUMMARY
+          echo "2. **Review and merge cross-repository PRs** (can be done in parallel)" >> $GITHUB_STEP_SUMMARY
+          echo "3. **Merge the main blog post PR** to publish the release announcement" >> $GITHUB_STEP_SUMMARY
+          echo "4. **Announce the release** through your usual channels" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "---" >> $GITHUB_STEP_SUMMARY
+          echo "🤖 *Automated release process completed successfully!*" >> $GITHUB_STEP_SUMMARY
