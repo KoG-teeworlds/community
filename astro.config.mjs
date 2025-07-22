@@ -24,39 +24,6 @@ export default defineConfig({
         dark: "./src/assets/brand/tee_light.svg",
         light: "./src/assets/brand/tee_dark.svg",
       },
-<<<<<<< HEAD
-      social: {
-        discord: "https://discord.kog.tw",
-        github: "https://github.com/KoG-teeworlds/community",
-      },
-      plugins: [
-        starlightBlog({
-          authors: {},
-        }),
-      ],
-      defaultLocale: "root",
-      locales: {
-        root: {
-          label: "English",
-          lang: "en",
-        },
-        ru: {
-          label: "Русский",
-        },
-        tr: {
-          label: "Türkçe",
-        },
-      },
-      sidebar: [
-        {
-          label: "Community",
-          translations: {
-            tr: "Topluluk",
-            ru: "Сообщество",
-          },
-          autogenerate: { directory: "community" },
-        },
-=======
       social: [
         { icon: "discord", label: "Discord", href: "https://discord.kog.tw" },
         {
@@ -99,7 +66,6 @@ export default defineConfig({
           },
           autogenerate: { directory: "community" },
         },
->>>>>>> ea7efc2 (fix: astro)
         {
           label: "Projects",
           translations: {
@@ -109,7 +75,6 @@ export default defineConfig({
           autogenerate: { directory: "projects" },
         },
         {
-<<<<<<< HEAD
           label: "Information",
           translations: {
             tr: "Bilgi",
@@ -118,8 +83,6 @@ export default defineConfig({
           autogenerate: { directory: "information" },
         },
         {
-=======
->>>>>>> ea7efc2 (fix: astro)
           label: "Guides",
           translations: {
             tr: "Rehberler",
@@ -128,21 +91,12 @@ export default defineConfig({
           autogenerate: { directory: "guides" },
         },
         {
-<<<<<<< HEAD
           label: "Agreements",
           translations: {
             tr: "Anlaşmalar",
             ru: "Соглашения",
           },
           autogenerate: { directory: "agreements" },
-=======
-          label: "Info",
-          translations: {
-            tr: "Bilgi",
-            ru: "Информация",
-          },
-          autogenerate: { directory: "info" },
->>>>>>> ea7efc2 (fix: astro)
         },
       ],
     }),
