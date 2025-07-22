@@ -360,20 +360,35 @@ jobs:
 
           # Read the repository links
           if [[ -f /tmp/repo_links.txt ]]; then
-            repo_links=$(cat /tmp/repo_links.txt)
+            if [[ -s /tmp/repo_links.txt ]]; then
+              python3 << 'PYTHON_EOF'
+              import re
 
-            # Update blog post with repository links
-            if [[ -n "$repo_links" ]]; then
-              # Replace the placeholder with actual links
-              sed -i '/<!-- AUTOMATED_REPO_LINKS_START -->/,/<!-- AUTOMATED_REPO_LINKS_END -->/{
-                /<!-- AUTOMATED_REPO_LINKS_START -->/!{
-                  /<!-- AUTOMATED_REPO_LINKS_END -->/!d
-                }
-              }' "$blog_path"
+              # Read the original blog post
+              with open('${{ steps.blog_post.outputs.blog_path }}', 'r') as f:
+                  content = f.read()
 
-              # Insert the new content
-              sed -i "/<!-- AUTOMATED_REPO_LINKS_START -->/a\\
-              $repo_links" "$blog_path"
+              # Read the repository links
+              try:
+                  with open('/tmp/repo_links.txt', 'r') as f:
+                      repo_links = f.read().strip()
+              except:
+                  repo_links = ""
+
+              if repo_links:
+                  # Replace the content between the markers
+                  pattern = r'<!-- AUTOMATED_REPO_LINKS_START -->.*?<!-- AUTOMATED_REPO_LINKS_END -->'
+                  replacement = f'<!-- AUTOMATED_REPO_LINKS_START -->\n{repo_links}\n<!-- AUTOMATED_REPO_LINKS_END -->'
+                  new_content = re.sub(pattern, replacement, content, flags=re.DOTALL)
+
+                  # Write the updated content
+                  with open('${{ steps.blog_post.outputs.blog_path }}', 'w') as f:
+                      f.write(new_content)
+
+                  print("✅ Updated blog post with repository links")
+              else:
+                  print("ℹ️ No repository links to add")
+              PYTHON_EOF
 
               # Commit the update
               git add "$blog_path"
