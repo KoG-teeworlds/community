@@ -194,11 +194,10 @@ jobs:
 
           echo "✅ Created blog post at $blog_path on branch $branch_name"
 
-      - name: Get repository list
-        id: repos
+      - name: Create repository list file
         run: |
-          # Define repositories with newline delimiter
-          cat > /tmp/repos.txt << 'EOF'
+          # Create repository list in a file to avoid GitHub Actions output formatting issues
+          cat > /tmp/repositories.list << 'EOF'
           KoG-teeworlds/temp_backend
           KoG-teeworlds/kog-2.0-server
           KoG-teeworlds/api-ws-rs
@@ -208,10 +207,6 @@ jobs:
           KoG-teeworlds/profanity-service
           KoG-teeworlds/ip-intel-api
           EOF
-
-          # Convert to JSON array
-          repos=$(cat /tmp/repos.txt | jq -R -s 'split("\n") | map(select(. != ""))')
-          echo "repositories=$repos" >> $GITHUB_OUTPUT
 
       - name: Create pull requests in all repositories
         id: create_prs
@@ -240,7 +235,8 @@ jobs:
           repo_links=""
 
           # Process each repository
-          echo "$repositories" | jq -r '.[]' | while read repo; do
+          while IFS= read -r repo; do
+            [[ -z "$repo" ]] && continue  # Skip empty lines
             echo "Processing repository: $repo"
 
             # Check if branches exist
