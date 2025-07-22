@@ -236,7 +236,7 @@ jobs:
 
           # Process each repository
           while IFS= read -r repo; do
-            [[ -z "$repo" ]] && continue  # Skip empty lines
+            [[ -z "$repo" ]] && continue
             echo "Processing repository: $repo"
 
             # Check if branches exist
@@ -343,7 +343,7 @@ jobs:
 
             # Small delay to avoid rate limiting
             sleep 1
-          done
+          done < /tmp/repositories.list
 
           # Save repo links for blog post update
           echo "$repo_links" > /tmp/repo_links.txt
