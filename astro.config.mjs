@@ -5,6 +5,7 @@ import starlightBlog from "starlight-blog";
 
 // https://astro.build/config
 export default defineConfig({
+  site: "https://community.kog.tw",
   vite: {
     build: {
       modulePreload: true,
