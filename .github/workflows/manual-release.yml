@@ -197,17 +197,20 @@ jobs:
       - name: Get repository list
         id: repos
         run: |
-          # Define your repositories here
-          repos='[
-            "KoG-teeworlds/temp_backend",
-            "KoG-teeworlds/kog-2.0-server",
-            "KoG-teeworlds/api-ws-rs",
-            "KoG-teeworlds/geoip-service",
-            "KoG-teeworlds/ws-client-rs",
-            "KoG-teeworlds/edgeservice",
-            "KoG-teeworlds/profanity-service",
-            "KoG-teeworlds/ip-intel-api"
-          ]'
+          # Define repositories with newline delimiter
+          cat > /tmp/repos.txt << 'EOF'
+          KoG-teeworlds/temp_backend
+          KoG-teeworlds/kog-2.0-server
+          KoG-teeworlds/api-ws-rs
+          KoG-teeworlds/geoip-service
+          KoG-teeworlds/ws-client-rs
+          KoG-teeworlds/edgeservice
+          KoG-teeworlds/profanity-service
+          KoG-teeworlds/ip-intel-api
+          EOF
+
+          # Convert to JSON array
+          repos=$(cat /tmp/repos.txt | jq -R -s 'split("\n") | map(select(. != ""))')
           echo "repositories=$repos" >> $GITHUB_OUTPUT
 
       - name: Create pull requests in all repositories
