@@ -259,41 +259,41 @@ jobs:
             # Create PR title and body
             pr_title="$icon $blog_type: $TITLE (v$VERSION)"
             pr_body="## $icon $blog_type: $TITLE
-              **Version:** \`$VERSION\`
-              **Environment:** \`$TARGET_ENV\`
-              **Source:** \`$source_branch\` → **Target:** \`$target_branch\`
+            **Version:** \`$VERSION\`
+            **Environment:** \`$TARGET_ENV\`
+            **Source:** \`$source_branch\` → **Target:** \`$target_branch\`
 
-              ### 📝 Release Blog Post
-              This release is documented in the main repository blog post. The blog post will be updated with links to all related PRs once they are created.
+            ### 📝 Release Blog Post
+            This release is documented in the main repository blog post. The blog post will be updated with links to all related PRs once they are created.
 
-              **Blog Branch:** [\`$blog_branch\`](https://github.com/${{ github.repository }}/tree/$blog_branch)
+            **Blog Branch:** [\`$blog_branch\`](https://github.com/${{ github.repository }}/tree/$blog_branch)
 
-              ### 🚀 What's Included
-              This automated PR merges the latest changes from \`$source_branch\` to \`$target_branch\` as part of the **$VERSION** $blog_type process.
+            ### 🚀 What's Included
+            This automated PR merges the latest changes from \`$source_branch\` to \`$target_branch\` as part of the **$VERSION** $blog_type process.
 
-              ### ✅ Pre-merge Checklist
-              - [ ] Review all changes in this PR
-              - [ ] Verify tests are passing
-              - [ ] Check that deployment configurations are correct
-              - [ ] Ensure documentation is up to date
-              - [ ] Confirm this aligns with the release blog post
+            ### ✅ Pre-merge Checklist
+            - [ ] Review all changes in this PR
+            - [ ] Verify tests are passing
+            - [ ] Check that deployment configurations are correct
+            - [ ] Ensure documentation is up to date
+            - [ ] Confirm this aligns with the release blog post
 
-              ### 🔗 Related Links
-              - **Main Repository:** [${{ github.repository }}](https://github.com/${{ github.repository }})
-              - **Release Workflow:** [View Workflow Run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            ### 🔗 Related Links
+            - **Main Repository:** [${{ github.repository }}](https://github.com/${{ github.repository }})
+            - **Release Workflow:** [View Workflow Run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
 
-              ---
-              *This PR was created automatically via manual release trigger by @${{ github.actor }}*"
+            ---
+            *This PR was created automatically via manual release trigger by @${{ github.actor }}*"
 
             if [[ -n "$existing_pr" ]]; then
               # Update existing PR with comment
               echo "Updating existing PR #$existing_pr in $repo"
               comment_body="🔄 **Updated for $blog_type v$VERSION**
 
-                This PR has been updated as part of the $TITLE release process.
+              This PR has been updated as part of the $TITLE release process.
 
-                **Blog Branch:** [\`$blog_branch\`](https://github.com/${{ github.repository }}/tree/$blog_branch)
-                **Workflow Run:** [View Details](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
+              **Blog Branch:** [\`$blog_branch\`](https://github.com/${{ github.repository }}/tree/$blog_branch)
+              **Workflow Run:** [View Details](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
 
               curl -s -X POST \
                 -H "Authorization: token $GITHUB_TOKEN" \
