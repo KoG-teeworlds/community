@@ -3,10 +3,7 @@ title: "2025.11.3 - Release"
 version: "2025.11.3"
 date: 2025-01-31
 authors:
- - name: 'Avolicious'
-   title: 'Project Maintainer'
-   picture: 'authors/avolicious.webp'
-   url: 'https://kog.tw'
+ - avolicious
 ---
 
 import { Card, Icon, Aside, Badge } from '@astrojs/starlight/components';
@@ -29,7 +26,7 @@ $$
 **Probability Formula:**
 
 $$
-\text{probability} = \left( \frac{\text{level}}{\text{max\_levels}} \cdot \text{level\_weight} \right) 
+\text{probability} = \left( \frac{\text{level}}{\text{max\_levels}} \cdot \text{level\_weight} \right)
 + \left( \frac{\text{length}}{\text{max\_length}} \cdot \text{length\_weight} \right)
 \cdot \text{matrix}[\text{length}][\text{level}]
 $$
@@ -40,7 +37,7 @@ $$
 
 $$
 \text{level} = 16, \, \text{length} = 9, \, \text{matrix}[9][16] = 0.0914 \\
-\text{probability} = \left( \frac{\text{16}}{\text{16}} \cdot \text{0.6} \right) 
+\text{probability} = \left( \frac{\text{16}}{\text{16}} \cdot \text{0.6} \right)
 + \left( \frac{\text{9}}{\text{9}} \cdot \text{0.4} \right)
 \cdot 0.0914 \\
 = 1 \cdot 0.6 + 1 \cdot 0.4 \cdot 0.0914 \\
@@ -51,7 +48,7 @@ $$
 
 $$
 \text{level} = 1, \, \text{length} = 1, \, \text{matrix}[1][1] = 0.0198 \\
-\text{probability} = \left( \frac{\text{1}}{\text{16}} \cdot \text{0.6} \right) 
+\text{probability} = \left( \frac{\text{1}}{\text{16}} \cdot \text{0.6} \right)
 + \left( \frac{\text{1}}{\text{9}} \cdot \text{0.4} \right)
 \cdot 0.0198 \\
 = 0.0625 \cdot 0.6 + 0.1111 \cdot 0.4 \cdot 0.0198 \\
