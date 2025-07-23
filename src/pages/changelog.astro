@@ -1,0 +1,1809 @@
+---
+const pageTitle = 'KoG Community - Development Changelog';
+const pageDescription = 'Track our development progress through GitHub milestones, issues, and real-time project updates';
+
+interface Milestone {
+  id: number;
+  title: string;
+  description: string;
+  state: "open" | "closed";
+  progress: number;
+  total_issues: number;
+  open_issues: number;
+  closed_issues: number;
+  created_at: string;
+  updated_at: string;
+  due_on: string | null;
+  closed_at: string | null;
+  html_url: string;
+  issues: Issue[];
+  categories: Record<string, number>;
+}
+
+interface Issue {
+  id: number;
+  number: number;
+  title: string;
+  body: string;
+  state: "open" | "closed";
+  created_at: string;
+  updated_at: string;
+  closed_at: string | null;
+  html_url: string;
+  author: {
+    login: string;
+    avatar_url: string;
+  };
+  assignees: Array<{
+    login: string;
+    avatar_url: string;
+  }>;
+  labels: Array<{
+    name: string;
+    color: string;
+    description: string;
+  }>;
+  category: string;
+  priority: string;
+  effort: string;
+}
+
+interface ChangelogData {
+  milestones: Milestone[];
+  pagination: {
+    current_page: number;
+    per_page: number;
+    total_items: number;
+    total_pages: number;
+    has_next: boolean;
+    has_prev: boolean;
+  };
+  stats: {
+    total_milestones: number;
+    open_milestones: number;
+    closed_milestones: number;
+    total_issues: number;
+    open_issues: number;
+    closed_issues: number;
+    categories: Record<string, number>;
+    recent_activity: number;
+  };
+}
+
+// Data will be fetched client-side
+let changelogData: ChangelogData | null = null;
+let error: string | null = null;
+
+const formatDate = (dateStr: string) => {
+  return new Date(dateStr).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+};
+
+const formatRelativeTime = (dateStr: string) => {
+  const date = new Date(dateStr);
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+  if (diffDays === 0) return 'Today';
+  if (diffDays === 1) return 'Yesterday';
+  if (diffDays < 7) return `${diffDays} days ago`;
+  if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
+  if (diffDays < 365) return `${Math.floor(diffDays / 30)} months ago`;
+  return `${Math.floor(diffDays / 365)} years ago`;
+};
+
+const getCategoryColor = (category: string) => {
+  const colors = {
+    feature: '#10b981',
+    bugfix: '#f59e0b',
+    performance: '#3b82f6',
+    security: '#ef4444',
+    maintenance: '#8b5cf6',
+    api: '#eab308',
+    documentation: '#06b6d4',
+    other: '#6b7280'
+  };
+  return colors[category as keyof typeof colors] || '#6b7280';
+};
+
+const getPriorityIcon = (priority: string) => {
+  const icons = {
+    critical: '🚨',
+    high: '⚡',
+    medium: '📋',
+    low: '📝'
+  };
+  return icons[priority as keyof typeof icons] || '📝';
+};
+
+const sanitizeDescription = (description: string) => {
+  if (!description) return '';
+
+  // Remove HTML tags
+  let sanitized = description.replace(/<[^>]*>/g, '');
+
+  // Convert markdown headers to plain text
+  sanitized = sanitized.replace(/^#{1,6}\s+/gm, '');
+
+  // Convert markdown bold/italic to plain text
+  sanitized = sanitized.replace(/\*\*([^*]+)\*\*/g, '$1');
+  sanitized = sanitized.replace(/\*([^*]+)\*/g, '$1');
+  sanitized = sanitized.replace(/__([^_]+)__/g, '$1');
+  sanitized = sanitized.replace(/_([^_]+)_/g, '$1');
+
+  // Remove markdown links, keep text
+  sanitized = sanitized.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1');
+
+  // Remove markdown code blocks
+  sanitized = sanitized.replace(/```[\s\S]*?```/g, '');
+  sanitized = sanitized.replace(/`([^`]+)`/g, '$1');
+
+  // Clean up extra whitespace
+  sanitized = sanitized.replace(/\n\s*\n/g, '\n');
+  sanitized = sanitized.trim();
+
+  // Truncate if too long
+  if (sanitized.length > 200) {
+    sanitized = sanitized.substring(0, 197) + '...';
+  }
+
+  return sanitized;
+};
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{pageTitle}</title>
+  <meta name="description" content={pageDescription}>
+  <link rel="icon" type="image/svg+xml" href="/tee_light.svg">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content={pageTitle}>
+  <meta property="og:description" content={pageDescription}>
+  <meta property="og:type" content="website">
+  <meta property="og:url" content={Astro.url.href}>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <div class="nav-brand">
+        <a href="/" class="brand-link">
+          <img src="/tee_light.svg" alt="KoG" class="brand-logo">
+          <span class="brand-text">KoG Community</span>
+        </a>
+      </div>
+      <div class="nav-links">
+        <a href="/" class="nav-link">Documentation</a>
+        <a href="/blog/" class="nav-link">Blog</a>
+        <a href="https://discord.kog.tw" target="_blank" rel="noopener" class="nav-link-external">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515a.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0a12.64 12.64 0 0 0-.617-1.25a.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057a19.9 19.9 0 0 0 5.993 3.03a.078.078 0 0 0 .084-.028a14.09 14.09 0 0 0 1.226-1.994a.076.076 0 0 0-.041-.106a13.107 13.107 0 0 1-1.872-.892a.077.077 0 0 1-.008-.128a10.2 10.2 0 0 0 .372-.292a.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127a12.299 12.299 0 0 1-1.873.892a.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028a19.839 19.839 0 0 0 6.002-3.03a.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419c0-1.333.956-2.419 2.157-2.419c1.21 0 2.176 1.096 2.157 2.42c0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419c0-1.333.955-2.419 2.157-2.419c1.21 0 2.176 1.096 2.157 2.42c0 1.333-.946 2.418-2.157 2.418z"/>
+          </svg>
+        </a>
+        <a href="https://github.com/KoG-teeworlds/community" target="_blank" rel="noopener" class="nav-link-external">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-background">
+      <div class="hero-particles"></div>
+      <div class="hero-grid"></div>
+    </div>
+    <div class="hero-container">
+      <div class="hero-content">
+        <div class="hero-badge">
+          <div class="badge-glow"></div>
+          <span class="badge-icon">🚀</span>
+          <span class="badge-text">Development Roadmap</span>
+        </div>
+        <h1 class="hero-title">Development Progress</h1>
+        <p class="hero-subtitle">
+          Follow our development journey through GitHub milestones, real-time progress updates,
+          and comprehensive project insights. Discover what we're building and what's coming next.
+        </p>
+
+        <div class="hero-stats" id="heroStats" style="display: none;">
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-value" id="totalMilestones">-</div>
+              <div class="stat-label">Total Milestones</div>
+              <div class="stat-icon">🎯</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" id="totalIssues">-</div>
+              <div class="stat-label">Total Issues</div>
+              <div class="stat-icon">📋</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" id="recentActivity">-</div>
+              <div class="stat-label">Recent Activity</div>
+              <div class="stat-icon">⚡</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" id="completionRate">-</div>
+              <div class="stat-label">Completed</div>
+              <div class="stat-icon">✅</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Content -->
+  <main class="main">
+    <div id="contentSection">
+      <div class="loading-section">
+        <div class="container">
+          <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <h2 class="loading-title">Loading Development Data...</h2>
+            <p class="loading-text">Fetching the latest milestones and progress updates</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-brand">
+          <img src="/tee_light.svg" alt="KoG" class="footer-logo">
+          <span class="footer-text">KoG Community</span>
+        </div>
+        <div class="footer-links">
+          <a href="/" class="footer-link">Documentation</a>
+          <a href="/blog/" class="footer-link">Blog</a>
+          <a href="https://github.com/KoG-teeworlds/community" target="_blank" rel="noopener" class="footer-link">GitHub</a>
+          <a href="https://discord.kog.tw" target="_blank" rel="noopener" class="footer-link">Discord</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <style is:global>
+    :root {
+      --bg-primary: #0a0a0a;
+      --bg-secondary: #111111;
+      --bg-tertiary: #1a1a1a;
+      --text-primary: #ffffff;
+      --text-secondary: #a0a0a0;
+      --text-muted: #666666;
+      --accent-primary: #10b981;
+      --accent-secondary: #3b82f6;
+      --border-primary: #2a2a2a;
+      --border-secondary: #333333;
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+      --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.4);
+      --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+      --gradient-primary: linear-gradient(135deg, #10b981, #3b82f6);
+      --gradient-glow: radial-gradient(circle, rgba(16, 185, 129, 0.1) 0%, transparent 70%);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    /* Navigation */
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      background: rgba(10, 10, 10, 0.8);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border-primary);
+    }
+
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+    }
+
+    .brand-link {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+      color: var(--text-primary);
+      font-weight: 600;
+      font-size: 1.125rem;
+    }
+
+    .brand-logo {
+      width: 32px;
+      height: 32px;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    .nav-link, .nav-link-external {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .nav-link:hover, .nav-link-external:hover {
+      color: var(--text-primary);
+    }
+
+    /* Hero Section */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+      padding-top: 80px;
+    }
+
+    .hero-background {
+      position: absolute;
+      inset: 0;
+      background: var(--gradient-glow);
+    }
+
+    .hero-particles {
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(circle at 25% 25%, rgba(16, 185, 129, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 75% 75%, rgba(59, 130, 246, 0.1) 0%, transparent 50%);
+    }
+
+    .hero-grid {
+      position: absolute;
+      inset: 0;
+      background-image: linear-gradient(rgba(42, 42, 42, 0.3) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(42, 42, 42, 0.3) 1px, transparent 1px);
+      background-size: 50px 50px;
+      mask-image: radial-gradient(ellipse 100% 100% at 50% 50%, black 0%, transparent 70%);
+    }
+
+    .hero-container {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    .hero-content {
+      text-align: center;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 1.5rem;
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      border-radius: 2rem;
+      margin-bottom: 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .badge-glow {
+      position: absolute;
+      inset: 0;
+      background: var(--gradient-primary);
+      opacity: 0.1;
+      border-radius: inherit;
+    }
+
+    .badge-icon {
+      font-size: 1.25rem;
+    }
+
+    .badge-text {
+      font-weight: 600;
+      color: var(--accent-primary);
+    }
+
+    .hero-title {
+      font-size: 4rem;
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 1.5rem;
+      background: linear-gradient(135deg, var(--text-primary), var(--accent-primary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-subtitle {
+      font-size: 1.25rem;
+      color: var(--text-secondary);
+      margin-bottom: 3rem;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .hero-stats {
+      margin-top: 4rem;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .stat-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-primary);
+      border-radius: 1rem;
+      padding: 2rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--accent-primary);
+    }
+
+    .stat-value {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: var(--accent-primary);
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      margin-bottom: 1rem;
+    }
+
+    .stat-icon {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      font-size: 1.5rem;
+      opacity: 0.3;
+    }
+
+    /* Main Content */
+    .main {
+      padding: 4rem 0;
+    }
+
+    .section-title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      color: var(--text-primary);
+    }
+
+    .section-subtitle {
+      font-size: 1.125rem;
+      color: var(--text-secondary);
+      margin-bottom: 3rem;
+    }
+
+    /* Dashboard */
+    .dashboard {
+      margin-bottom: 6rem;
+    }
+
+    .dashboard-header {
+      text-align: center;
+      margin-bottom: 4rem;
+    }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+      gap: 2rem;
+    }
+
+    .dashboard-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-primary);
+      border-radius: 1.5rem;
+      padding: 2rem;
+      transition: all 0.3s ease;
+    }
+
+    .dashboard-card:hover {
+      border-color: var(--accent-primary);
+      transform: translateY(-2px);
+    }
+
+    .dashboard-card.wide {
+      grid-column: 1 / -1;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 2rem;
+    }
+
+    .card-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .card-icon {
+      font-size: 1.5rem;
+      opacity: 0.7;
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.75rem;
+      font-weight: 500;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      border: none;
+      font-size: 0.875rem;
+    }
+
+    .btn-primary {
+      background: var(--accent-primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #059669;
+      transform: translateY(-1px);
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--text-secondary);
+      border: 1px solid var(--border-secondary);
+    }
+
+    .btn-outline:hover {
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+      border-color: var(--accent-primary);
+    }
+
+    .btn-sm {
+      padding: 0.5rem 1rem;
+      font-size: 0.8125rem;
+    }
+
+    /* Progress Circle */
+    .progress-circle {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 2rem;
+    }
+
+    .circle-svg {
+      transform: rotate(-90deg);
+    }
+
+    .progress-stroke {
+      transition: stroke-dashoffset 1s ease;
+    }
+
+    .circle-content {
+      position: absolute;
+      text-align: center;
+    }
+
+    .circle-percentage {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--accent-primary);
+    }
+
+    .circle-label {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+    }
+
+    .progress-details {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .detail-item {
+      text-align: center;
+    }
+
+    .detail-label {
+      display: block;
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      margin-bottom: 0.25rem;
+    }
+
+    .detail-value {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    /* Categories */
+    .categories-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .category-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .category-info {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .category-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .category-name {
+      font-weight: 500;
+      color: var(--text-primary);
+      text-transform: capitalize;
+    }
+
+    .category-stats {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .category-count {
+      font-weight: 600;
+      color: var(--text-secondary);
+      min-width: 2rem;
+      text-align: right;
+    }
+
+    .category-bar {
+      width: 60px;
+      height: 4px;
+      background: var(--bg-tertiary);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .category-fill {
+      height: 100%;
+      border-radius: inherit;
+      transition: width 0.6s ease;
+    }
+
+    /* Active Milestones */
+    .active-milestones {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .milestone-preview {
+      padding: 1.5rem;
+      background: var(--bg-tertiary);
+      border-radius: 1rem;
+      border: 1px solid var(--border-primary);
+    }
+
+    .milestone-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+
+    .milestone-name {
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin: 0;
+    }
+
+    .milestone-progress-text {
+      font-weight: 600;
+      color: var(--accent-primary);
+    }
+
+    .milestone-progress-bar {
+      margin-bottom: 0.75rem;
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 6px;
+      background: var(--bg-primary);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--accent-primary);
+      border-radius: inherit;
+      transition: width 0.6s ease;
+    }
+
+    .milestone-meta {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .meta-item {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+    }
+
+    /* Milestones Section */
+    .milestones {
+      margin-bottom: 4rem;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 3rem;
+      gap: 2rem;
+    }
+
+    .header-content {
+      flex: 1;
+    }
+
+    .filter-tabs {
+      display: flex;
+      background: var(--bg-secondary);
+      border-radius: 0.75rem;
+      padding: 0.25rem;
+      border: 1px solid var(--border-primary);
+    }
+
+    .filter-tab {
+      padding: 0.5rem 1rem;
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      border-radius: 0.5rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-weight: 500;
+    }
+
+    .filter-tab.active {
+      background: var(--accent-primary);
+      color: white;
+    }
+
+    .filter-tab:hover:not(.active) {
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+    }
+
+    .milestones-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+      gap: 2rem;
+    }
+
+    .milestone-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-primary);
+      border-radius: 1.5rem;
+      padding: 2rem;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
+
+    .milestone-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--accent-primary);
+    }
+
+    .milestone-card:hover .milestone-glow {
+      opacity: 1;
+    }
+
+    .milestone-glow {
+      position: absolute;
+      inset: 0;
+      background: var(--gradient-glow);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+    }
+
+    .milestone-card .milestone-header {
+      margin-bottom: 1.5rem;
+    }
+
+    .milestone-status {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+
+    .status-badge {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      border-radius: 2rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+    }
+
+    .status-badge[data-state="open"] {
+      background: rgba(59, 130, 246, 0.1);
+      color: #3b82f6;
+      border: 1px solid rgba(59, 130, 246, 0.3);
+    }
+
+    .status-badge[data-state="closed"] {
+      background: rgba(16, 185, 129, 0.1);
+      color: #10b981;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .milestone-link {
+      color: var(--text-secondary);
+      transition: color 0.2s ease;
+    }
+
+    .milestone-link:hover {
+      color: var(--accent-primary);
+    }
+
+    .milestone-title {
+      font-size: 1.375rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin: 0 0 1rem 0;
+      line-height: 1.3;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      hyphens: auto;
+    }
+
+    .milestone-description-section {
+      margin-bottom: 1.5rem;
+      padding: 1rem;
+      background: var(--bg-tertiary);
+      border-radius: 0.75rem;
+      border: 1px solid var(--border-primary);
+    }
+
+    .milestone-description {
+      color: var(--text-secondary);
+      margin: 0;
+      line-height: 1.6;
+      font-size: 0.875rem;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      hyphens: auto;
+      white-space: pre-line;
+      max-width: 100%;
+    }
+
+    .milestone-progress {
+      margin-bottom: 1.5rem;
+    }
+
+    .progress-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.75rem;
+    }
+
+    .progress-label {
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .progress-value {
+      font-weight: 600;
+      color: var(--accent-primary);
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: var(--bg-tertiary);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 0.75rem;
+    }
+
+    .progress-stats {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .stat-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+    }
+
+    .stat-icon {
+      font-size: 1rem;
+    }
+
+    .milestone-categories {
+      margin-bottom: 1.5rem;
+    }
+
+    .categories-header {
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: 0.75rem;
+      font-size: 0.875rem;
+    }
+
+    .categories-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .category-tag {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.375rem 0.75rem;
+      border-radius: 0.5rem;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      border: 1px solid;
+    }
+
+    .tag-name {
+      text-transform: capitalize;
+    }
+
+    .tag-count {
+      opacity: 0.8;
+    }
+
+    .milestone-footer {
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border-primary);
+    }
+
+    .milestone-dates {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .date-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+    }
+
+    .date-icon {
+      font-size: 1rem;
+    }
+
+    /* Load More */
+    .load-more {
+      text-align: center;
+      margin-top: 3rem;
+    }
+
+    /* Error States */
+    .error-section, .loading-section {
+      padding: 6rem 0;
+    }
+
+    .error-card, .loading-content {
+      text-align: center;
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 3rem;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-primary);
+      border-radius: 1.5rem;
+    }
+
+    .error-icon {
+      font-size: 4rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .error-title, .loading-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 1rem;
+    }
+
+    .error-message, .loading-text {
+      color: var(--text-secondary);
+      margin-bottom: 2rem;
+    }
+
+    .error-actions {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+    }
+
+    .loading-spinner {
+      width: 3rem;
+      height: 3rem;
+      border: 3px solid var(--border-primary);
+      border-top: 3px solid var(--accent-primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 1.5rem;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Footer */
+    .footer {
+      background: var(--bg-secondary);
+      border-top: 1px solid var(--border-primary);
+      padding: 2rem 0;
+    }
+
+    .footer-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .footer-logo {
+      width: 24px;
+      height: 24px;
+    }
+
+    .footer-text {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 2rem;
+    }
+
+    .footer-link {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s ease;
+    }
+
+    .footer-link:hover {
+      color: var(--text-primary);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .container {
+        padding: 0 1rem;
+      }
+
+      .nav-container {
+        padding: 1rem;
+      }
+
+      .nav-links {
+        gap: 1rem;
+      }
+
+      .hero-title {
+        font-size: 2.5rem;
+      }
+
+      .hero-subtitle {
+        font-size: 1rem;
+      }
+
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+      }
+
+      .stat-card {
+        padding: 1.5rem;
+      }
+
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .milestones-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+      }
+
+      .footer-content {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+      }
+
+      .footer-links {
+        gap: 1rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .milestone-card {
+        padding: 1.5rem;
+      }
+
+      .milestone-description-section {
+        padding: 0.75rem;
+        margin-bottom: 1rem;
+      }
+
+      .milestone-description {
+        font-size: 0.8125rem;
+      }
+
+      .progress-stats {
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      .categories-tags {
+        flex-direction: column;
+      }
+
+      .milestone-dates {
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+    }
+  </style>
+
+  <script>
+    const GITHUB_REPO = "KoG-teeworlds/community";
+    const GITHUB_API_BASE = "https://api.github.com";
+
+    let changelogData = null;
+    let currentPage = 1;
+    let hasNextPage = false;
+
+    // Initialize the page
+    document.addEventListener('DOMContentLoaded', async function() {
+      try {
+        const milestones = await fetchMilestonesWithIssues();
+        renderContent(milestones);
+        initializeFilters();
+      } catch (error) {
+        showError(error.message);
+      }
+    });
+
+    // Show error state
+    function showError(message) {
+      const contentSection = document.getElementById('contentSection');
+      contentSection.innerHTML = `
+        <div class="error-section">
+          <div class="container">
+            <div class="error-card">
+              <div class="error-icon">⚠️</div>
+              <h2 class="error-title">Unable to Load Development Data</h2>
+              <p class="error-message">${message}</p>
+              <div class="error-actions">
+                <button onclick="window.location.reload()" class="btn btn-primary">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M1 4v6h6m16 10v-6h-6m-1-4a9 9 0 01-9 9m0-18a9 9 0 019 9"/>
+                  </svg>
+                  <span>Retry</span>
+                </button>
+                <a href="https://github.com/KoG-teeworlds/community" class="btn btn-outline" target="_blank" rel="noopener">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6m4-3h6v6m-11 5L21 3"/>
+                  </svg>
+                  <span>View on GitHub</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // Sanitize description function
+    function sanitizeDescription(description) {
+      if (!description) return '';
+
+      let sanitized = description.replace(/<[^>]*>/g, '');
+      sanitized = sanitized.replace(/^#{1,6}\s+/gm, '');
+      sanitized = sanitized.replace(/\*\*([^*]+)\*\*/g, '$1');
+      sanitized = sanitized.replace(/\*([^*]+)\*/g, '$1');
+      sanitized = sanitized.replace(/__([^_]+)__/g, '$1');
+      sanitized = sanitized.replace(/_([^_]+)_/g, '$1');
+      sanitized = sanitized.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1');
+      sanitized = sanitized.replace(/```[\s\S]*?```/g, '');
+      sanitized = sanitized.replace(/`([^`]+)`/g, '$1');
+      sanitized = sanitized.replace(/\n\s*\n/g, '\n');
+      sanitized = sanitized.trim();
+
+      if (sanitized.length > 200) {
+        sanitized = sanitized.substring(0, 197) + '...';
+      }
+
+      return sanitized;
+    }
+
+    // Format date functions
+    function formatDate(dateStr) {
+      return new Date(dateStr).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    }
+
+    function formatRelativeTime(dateStr) {
+      const date = new Date(dateStr);
+      const now = new Date();
+      const diffMs = now.getTime() - date.getTime();
+      const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+      if (diffDays === 0) return 'Today';
+      if (diffDays === 1) return 'Yesterday';
+      if (diffDays < 7) return `${diffDays} days ago`;
+      if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
+      if (diffDays < 365) return `${Math.floor(diffDays / 30)} months ago`;
+      return `${Math.floor(diffDays / 365)} years ago`;
+    }
+
+    function getCategoryColor(category) {
+      const colors = {
+        feature: '#10b981',
+        bugfix: '#f59e0b',
+        performance: '#3b82f6',
+        security: '#ef4444',
+        maintenance: '#8b5cf6',
+        api: '#eab308',
+        documentation: '#06b6d4',
+        other: '#6b7280'
+      };
+      return colors[category] || '#6b7280';
+    }
+
+    // Fetch from GitHub API
+    async function fetchFromGitHub(endpoint) {
+      const response = await fetch(`${GITHUB_API_BASE}/repos/${GITHUB_REPO}/${endpoint}`, {
+        headers: {
+          'Accept': 'application/vnd.github.v3+json',
+          'User-Agent': 'KoG-Community-Changelog'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`GitHub API error: ${response.status} ${response.statusText}`);
+      }
+
+      return await response.json();
+    }
+
+    // Categorize issue
+    function categorizeIssue(issue) {
+      const labels = issue.labels.map(label => label.name.toLowerCase());
+
+      let category = 'other';
+      if (labels.some(l => l.includes('bug') || l.includes('fix'))) category = 'bugfix';
+      else if (labels.some(l => l.includes('feature') || l.includes('enhancement'))) category = 'feature';
+      else if (labels.some(l => l.includes('security'))) category = 'security';
+      else if (labels.some(l => l.includes('performance'))) category = 'performance';
+      else if (labels.some(l => l.includes('api'))) category = 'api';
+      else if (labels.some(l => l.includes('docs') || l.includes('documentation'))) category = 'documentation';
+      else if (labels.some(l => l.includes('maintenance') || l.includes('chore'))) category = 'maintenance';
+
+      let priority = 'medium';
+      if (labels.some(l => l.includes('critical') || l.includes('urgent'))) priority = 'critical';
+      else if (labels.some(l => l.includes('high'))) priority = 'high';
+      else if (labels.some(l => l.includes('low'))) priority = 'low';
+
+      let effort = 'medium';
+      if (labels.some(l => l.includes('epic') || l.includes('large'))) effort = 'large';
+      else if (labels.some(l => l.includes('small') || l.includes('quick'))) effort = 'small';
+
+      return { category, priority, effort };
+    }
+
+    // Process issue
+    function processIssue(issue) {
+      const { category, priority, effort } = categorizeIssue(issue);
+      return {
+        id: issue.id,
+        number: issue.number,
+        title: issue.title,
+        body: issue.body || '',
+        state: issue.state,
+        created_at: issue.created_at,
+        updated_at: issue.updated_at,
+        closed_at: issue.closed_at,
+        html_url: issue.html_url,
+        author: {
+          login: issue.user.login,
+          avatar_url: issue.user.avatar_url
+        },
+        assignees: issue.assignees,
+        labels: issue.labels,
+        category,
+        priority,
+        effort
+      };
+    }
+
+    // Fetch milestones with issues
+    async function fetchMilestonesWithIssues() {
+      try {
+        const [openMilestones, closedMilestones] = await Promise.all([
+          fetchFromGitHub("milestones?state=open&sort=due_on&direction=asc"),
+          fetchFromGitHub("milestones?state=closed&sort=updated&direction=desc")
+        ]);
+
+        const allMilestones = [...openMilestones, ...closedMilestones];
+        const processedMilestones = [];
+
+        for (const milestone of allMilestones.slice(0, 20)) {
+          try {
+            const issues = await fetchFromGitHub(
+              `issues?milestone=${milestone.number}&state=all&sort=updated&direction=desc&per_page=100`
+            );
+
+            const processedIssues = issues.map(processIssue);
+
+            const categories = processedIssues.reduce((acc, issue) => {
+              acc[issue.category] = (acc[issue.category] || 0) + 1;
+              return acc;
+            }, {});
+
+            const totalIssues = milestone.open_issues + milestone.closed_issues;
+            const progress = totalIssues > 0 ? Math.round((milestone.closed_issues / totalIssues) * 100) : 0;
+
+            processedMilestones.push({
+              id: milestone.id,
+              title: milestone.title,
+              description: milestone.description || '',
+              state: milestone.state,
+              progress,
+              total_issues: totalIssues,
+              open_issues: milestone.open_issues,
+              closed_issues: milestone.closed_issues,
+              created_at: milestone.created_at,
+              updated_at: milestone.updated_at,
+              due_on: milestone.due_on,
+              closed_at: milestone.closed_at,
+              html_url: milestone.html_url,
+              issues: processedIssues,
+              categories
+            });
+          } catch (error) {
+            console.warn(`Failed to process milestone ${milestone.title}:`, error);
+            continue;
+          }
+        }
+
+        return processedMilestones;
+      } catch (error) {
+        console.error('Failed to fetch milestones:', error);
+        return [];
+      }
+    }
+
+    // Render content
+    function renderContent(data) {
+      const contentSection = document.getElementById('contentSection');
+
+      // Calculate stats
+      const stats = {
+        total_milestones: data.length,
+        open_milestones: data.filter(m => m.state === 'open').length,
+        closed_milestones: data.filter(m => m.state === 'closed').length,
+        total_issues: data.reduce((sum, m) => sum + m.total_issues, 0),
+        open_issues: data.reduce((sum, m) => sum + m.open_issues, 0),
+        closed_issues: data.reduce((sum, m) => sum + m.closed_issues, 0),
+        categories: data.reduce((acc, milestone) => {
+          Object.entries(milestone.categories).forEach(([cat, count]) => {
+            acc[cat] = (acc[cat] || 0) + count;
+          });
+          return acc;
+        }, {}),
+        recent_activity: data.filter(milestone => {
+          const updatedDate = new Date(milestone.updated_at);
+          const thirtyDaysAgo = new Date();
+          thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+          return updatedDate >= thirtyDaysAgo;
+        }).length
+      };
+
+      // Update hero stats
+      document.getElementById('totalMilestones').textContent = stats.total_milestones;
+      document.getElementById('totalIssues').textContent = stats.total_issues;
+      document.getElementById('recentActivity').textContent = stats.recent_activity;
+      document.getElementById('completionRate').textContent = Math.round((stats.closed_issues / stats.total_issues) * 100) + '%';
+      document.getElementById('heroStats').style.display = 'block';
+
+      // Sort milestones
+      data.sort((a, b) => {
+        if (a.state !== b.state) {
+          return a.state === 'open' ? -1 : 1;
+        }
+        if (a.due_on && b.due_on) {
+          return new Date(a.due_on).getTime() - new Date(b.due_on).getTime();
+        }
+        return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime();
+      });
+
+      // Render dashboard and milestones
+      contentSection.innerHTML = `
+        <!-- Dashboard Section -->
+        <section class="dashboard">
+          <div class="container">
+            <div class="dashboard-header">
+              <h2 class="section-title">Development Dashboard</h2>
+              <p class="section-subtitle">Real-time insights into our development progress</p>
+            </div>
+            ${renderDashboard(stats, data)}
+          </div>
+        </section>
+
+        <!-- Milestones Section -->
+        <section class="milestones">
+          <div class="container">
+            <div class="section-header">
+              <div class="header-content">
+                <h2 class="section-title">Development Milestones</h2>
+                <p class="section-subtitle">Detailed view of our development roadmap and achievements</p>
+              </div>
+              <div class="header-actions">
+                <div class="filter-tabs">
+                  <button class="filter-tab active" data-filter="all">All</button>
+                  <button class="filter-tab" data-filter="open">Active</button>
+                  <button class="filter-tab" data-filter="closed">Completed</button>
+                </div>
+              </div>
+            </div>
+            <div class="milestones-grid">
+              ${renderMilestones(data)}
+            </div>
+          </div>
+        </section>
+      `;
+    }
+
+    // Render dashboard
+    function renderDashboard(stats, data) {
+      const completionPercentage = Math.round((stats.closed_issues / stats.total_issues) * 100);
+      const maxCategoryCount = Math.max(...Object.values(stats.categories));
+
+      return `
+        <div class="dashboard-grid">
+          <!-- Progress Overview -->
+          <div class="dashboard-card">
+            <div class="card-header">
+              <h3 class="card-title">Progress Overview</h3>
+              <div class="card-icon">📊</div>
+            </div>
+            <div class="card-content">
+              <div class="progress-circle">
+                <svg width="140" height="140" class="circle-svg">
+                  <circle cx="70" cy="70" r="60" stroke="rgba(107, 114, 128, 0.2)" stroke-width="8" fill="none"/>
+                  <circle cx="70" cy="70" r="60" stroke="#10b981" stroke-width="8" fill="none" stroke-linecap="round"
+                    stroke-dasharray="${2 * Math.PI * 60}"
+                    stroke-dashoffset="${2 * Math.PI * 60 * (1 - (stats.closed_issues / stats.total_issues))}"
+                    transform="rotate(-90 70 70)" class="progress-stroke"/>
+                </svg>
+                <div class="circle-content">
+                  <div class="circle-percentage">${completionPercentage}%</div>
+                  <div class="circle-label">Complete</div>
+                </div>
+              </div>
+              <div class="progress-details">
+                <div class="detail-item">
+                  <span class="detail-label">Completed</span>
+                  <span class="detail-value">${stats.closed_issues}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">In Progress</span>
+                  <span class="detail-value">${stats.open_issues}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Category Breakdown -->
+          <div class="dashboard-card">
+            <div class="card-header">
+              <h3 class="card-title">Issue Categories</h3>
+              <div class="card-icon">🏷️</div>
+            </div>
+            <div class="card-content">
+              <div class="categories-list">
+                ${Object.entries(stats.categories)
+                  .sort(([,a], [,b]) => b - a)
+                  .slice(0, 6)
+                  .map(([category, count]) => `
+                    <div class="category-item">
+                      <div class="category-info">
+                        <div class="category-dot" style="background: ${getCategoryColor(category)}"></div>
+                        <span class="category-name">${category}</span>
+                      </div>
+                      <div class="category-stats">
+                        <span class="category-count">${count}</span>
+                        <div class="category-bar">
+                          <div class="category-fill" style="width: ${(count / maxCategoryCount) * 100}%; background: ${getCategoryColor(category)}"></div>
+                        </div>
+                      </div>
+                    </div>
+                  `).join('')}
+              </div>
+            </div>
+          </div>
+
+          <!-- Active Milestones -->
+          <div class="dashboard-card wide">
+            <div class="card-header">
+              <h3 class="card-title">Active Milestones</h3>
+              <div class="card-actions">
+                <a href="https://github.com/KoG-teeworlds/community/milestones" target="_blank" rel="noopener" class="btn btn-sm">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6m4-3h6v6m-11 5L21 3"/>
+                  </svg>
+                  View All
+                </a>
+              </div>
+            </div>
+            <div class="card-content">
+              <div class="active-milestones">
+                ${data.filter(m => m.state === 'open').slice(0, 3).map(milestone => `
+                  <div class="milestone-preview">
+                    <div class="milestone-header">
+                      <h4 class="milestone-name">${milestone.title}</h4>
+                      <div class="milestone-progress-text">${milestone.progress}%</div>
+                    </div>
+                    <div class="milestone-progress-bar">
+                      <div class="progress-track">
+                        <div class="progress-fill" style="width: ${milestone.progress}%"></div>
+                      </div>
+                    </div>
+                    <div class="milestone-meta">
+                      <span class="meta-item">${milestone.closed_issues}/${milestone.total_issues} issues</span>
+                      ${milestone.due_on ? `<span class="meta-item">Due ${formatDate(milestone.due_on)}</span>` : ''}
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // Render milestones
+    function renderMilestones(data) {
+      return data.map(milestone => `
+        <article class="milestone-card" data-state="${milestone.state}">
+          <div class="milestone-glow"></div>
+          <div class="milestone-header">
+            <div class="milestone-status">
+              <div class="status-badge" data-state="${milestone.state}">
+                <span class="status-icon">${milestone.state === 'open' ? '🔄' : '✅'}</span>
+                <span class="status-text">${milestone.state === 'open' ? 'In Progress' : 'Completed'}</span>
+              </div>
+              <a href="${milestone.html_url}" target="_blank" rel="noopener" class="milestone-link">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6m4-3h6v6m-11 5L21 3"/>
+                </svg>
+              </a>
+            </div>
+            <h3 class="milestone-title">${milestone.title}</h3>
+          </div>
+          <div class="milestone-progress">
+            <div class="progress-header">
+              <span class="progress-label">Progress</span>
+              <span class="progress-value">${milestone.progress}%</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill" style="width: ${milestone.progress}%"></div>
+            </div>
+            <div class="progress-stats">
+              <span class="stat-item">
+                <span class="stat-icon">✅</span>
+                <span>${milestone.closed_issues} completed</span>
+              </span>
+              <span class="stat-item">
+                <span class="stat-icon">🔄</span>
+                <span>${milestone.open_issues} remaining</span>
+              </span>
+            </div>
+          </div>
+          ${milestone.description ? `
+          <div class="milestone-description-section">
+            <p class="milestone-description">${sanitizeDescription(milestone.description)}</p>
+          </div>
+          ` : ''}
+          ${Object.keys(milestone.categories).length > 0 ? `
+          <div class="milestone-categories">
+            <div class="categories-header">Categories</div>
+            <div class="categories-tags">
+              ${Object.entries(milestone.categories)
+                .sort(([,a], [,b]) => b - a)
+                .slice(0, 4)
+                .map(([category, count]) => `
+                  <div class="category-tag" style="background: ${getCategoryColor(category)}15; border-color: ${getCategoryColor(category)}40; color: ${getCategoryColor(category)}">
+                    <span class="tag-name">${category}</span>
+                    <span class="tag-count">${count}</span>
+                  </div>
+                `).join('')}
+            </div>
+          </div>
+          ` : ''}
+          <div class="milestone-footer">
+            <div class="milestone-dates">
+              ${milestone.due_on ? `
+              <div class="date-item">
+                <span class="date-icon">📅</span>
+                <span class="date-text">Due ${formatDate(milestone.due_on)}</span>
+              </div>
+              ` : ''}
+              <div class="date-item">
+                <span class="date-icon">⏱️</span>
+                <span class="date-text">Updated ${formatRelativeTime(milestone.updated_at)}</span>
+              </div>
+            </div>
+          </div>
+        </article>
+      `).join('');
+    }
+
+    // Initialize filter functionality
+    function initializeFilters() {
+      const filterTabs = document.querySelectorAll('.filter-tab');
+
+      filterTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          // Update active tab
+          filterTabs.forEach(t => t.classList.remove('active'));
+          tab.classList.add('active');
+
+          // Filter milestones
+          const filter = tab.dataset.filter;
+          const milestoneCards = document.querySelectorAll('.milestone-card');
+
+          milestoneCards.forEach(card => {
+            if (filter === 'all' || card.dataset.state === filter) {
+              card.style.display = 'block';
+            } else {
+              card.style.display = 'none';
+            }
+          });
+        });
+      });
+    }
+
+    // Load more functionality placeholder
+    function loadMoreMilestones() {
+      console.log('Loading more milestones...');
+    }
+  </script>
+</body>
+</html>

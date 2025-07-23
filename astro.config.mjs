@@ -2,6 +2,7 @@
 import { defineConfig } from "astro/config";
 import starlight from "@astrojs/starlight";
 import starlightBlog from "starlight-blog";
+import starlightUtils from "@lorenzo_lewis/starlight-utils";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 
@@ -49,6 +50,13 @@ export default defineConfig({
             },
           },
         }),
+        starlightUtils({
+          navLinks: {
+            leading: {
+              useSidebarLabelled: "topNavLinks",
+            },
+          },
+        }),
       ],
       defaultLocale: "root",
       locales: {
@@ -64,6 +72,10 @@ export default defineConfig({
         },
       },
       sidebar: [
+        {
+          label: "topNavLinks",
+          items: [{ label: "Changelog", link: "/changelog/" }],
+        },
         {
           label: "Community",
           translations: {

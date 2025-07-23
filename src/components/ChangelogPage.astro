@@ -1,0 +1,858 @@
+---
+// No imports needed since we're removing the stats component
+---
+
+<div class="roadmap-container">
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-content">
+      <div class="hero-badge">
+        <div class="pulse-dot"></div>
+        <span>Live Development</span>
+      </div>
+      <h1 class="hero-title">Development Roadmap</h1>
+      <p class="hero-subtitle">
+        Track our journey as we build the future of KoG together.
+        Real-time updates from our GitHub milestones and issues.
+      </p>
+    </div>
+  </section>
+
+  <!-- Main Content -->
+  <section class="main-section">
+    <div class="content-container">
+      <!-- Loading State -->
+      <div class="loading-state" id="milestones-loading">
+        <div class="loading-header">
+          <div class="skeleton skeleton-title"></div>
+          <div class="skeleton skeleton-subtitle"></div>
+        </div>
+        <div class="loading-grid">
+          <div class="skeleton-card">
+            <div class="skeleton skeleton-card-header"></div>
+            <div class="skeleton skeleton-progress"></div>
+            <div class="skeleton skeleton-stats"></div>
+            <div class="skeleton skeleton-footer"></div>
+          </div>
+          <div class="skeleton-card">
+            <div class="skeleton skeleton-card-header"></div>
+            <div class="skeleton skeleton-progress"></div>
+            <div class="skeleton skeleton-stats"></div>
+            <div class="skeleton skeleton-footer"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Error State -->
+      <div class="error-state" id="milestones-error" style="display: none;">
+        <div class="error-icon">⚠️</div>
+        <h3 class="error-title">Unable to load roadmap</h3>
+        <p class="error-message">We couldn't fetch the latest development updates from GitHub.</p>
+        <div class="error-actions">
+          <button class="btn btn-primary" id="retry-milestones">
+            <span class="btn-icon">🔄</span>
+            Try Again
+          </button>
+          <a href="https://github.com/KoG-teeworlds/community/milestones" target="_blank" class="btn btn-secondary">
+            <span class="btn-icon">🔗</span>
+            View on GitHub
+          </a>
+        </div>
+      </div>
+
+      <!-- Milestones Content -->
+      <div class="milestones-content" id="milestones-content" style="display: none;">
+        <div class="milestones-grid" id="milestones-list">
+          <!-- Milestones will be populated here -->
+        </div>
+
+        <!-- Load More -->
+        <div class="load-more-section" id="load-more-container" style="display: none;">
+          <button class="load-more-btn" id="load-more-btn">
+            <span class="load-more-text">Load More Milestones</span>
+            <div class="load-more-arrow">↓</div>
+          </button>
+        </div>
+
+        <!-- End Message -->
+        <div class="end-section" id="end-message" style="display: none;">
+          <div class="end-icon">🎉</div>
+          <h3 class="end-title">All caught up!</h3>
+          <p class="end-text">You've seen all our development milestones.</p>
+          <a href="https://github.com/KoG-teeworlds/community/milestones" target="_blank" class="btn btn-outline">
+            <span class="btn-icon">📋</span>
+            Browse All on GitHub
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<style>
+  /* Reset and base styles */
+  * {
+    box-sizing: border-box;
+  }
+
+  /* Container */
+  .roadmap-container {
+    min-height: 100vh;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    line-height: 1.5;
+  }
+
+  /* Hero Section */
+  .hero-section {
+    padding: 80px 24px 40px;
+    text-align: center;
+    border-bottom: 1px solid var(--sl-color-hairline);
+  }
+
+  .hero-content {
+    max-width: 768px;
+    margin: 0 auto;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--sl-color-bg-nav);
+    border: 1px solid var(--sl-color-hairline);
+    padding: 6px 12px;
+    border-radius: 16px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--sl-color-gray-3);
+    margin-bottom: 24px;
+  }
+
+  .pulse-dot {
+    width: 6px;
+    height: 6px;
+    background: #22c55e;
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.1); }
+  }
+
+  .hero-title {
+    font-size: 48px;
+    font-weight: 700;
+    line-height: 1.1;
+    margin: 0 0 16px 0;
+    letter-spacing: -0.025em;
+    color: var(--sl-color-white);
+  }
+
+  .hero-subtitle {
+    font-size: 18px;
+    color: var(--sl-color-gray-3);
+    margin: 0;
+    line-height: 1.6;
+  }
+
+  /* Main Section */
+  .main-section {
+    padding: 40px 24px;
+  }
+
+  .content-container {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  /* Loading States */
+  .loading-state {
+    animation: fadeIn 0.4s ease-out;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .loading-header {
+    margin-bottom: 32px;
+  }
+
+  .skeleton {
+    background: linear-gradient(
+      90deg,
+      var(--sl-color-bg-nav) 25%,
+      var(--sl-color-accent-low) 50%,
+      var(--sl-color-bg-nav) 75%
+    );
+    background-size: 200% 100%;
+    border-radius: 6px;
+    animation: shimmer 1.5s infinite;
+  }
+
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+
+  .skeleton-title {
+    height: 32px;
+    width: 60%;
+    margin-bottom: 12px;
+  }
+
+  .skeleton-subtitle {
+    height: 20px;
+    width: 40%;
+  }
+
+  .loading-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .skeleton-card {
+    background: var(--sl-color-bg-nav);
+    border: 1px solid var(--sl-color-hairline);
+    border-radius: 12px;
+    padding: 24px;
+    min-height: 200px;
+  }
+
+  .skeleton-card-header {
+    height: 24px;
+    width: 70%;
+    margin-bottom: 16px;
+  }
+
+  .skeleton-progress {
+    height: 60px;
+    width: 100%;
+    margin-bottom: 16px;
+  }
+
+  .skeleton-stats {
+    height: 40px;
+    width: 100%;
+    margin-bottom: 16px;
+  }
+
+  .skeleton-footer {
+    height: 20px;
+    width: 50%;
+  }
+
+  /* Error State */
+  .error-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 80px 24px;
+    min-height: 400px;
+    justify-content: center;
+  }
+
+  .error-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+  }
+
+  .error-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--sl-color-white);
+    margin: 0 0 8px 0;
+  }
+
+  .error-message {
+    color: var(--sl-color-gray-3);
+    margin: 0 0 32px 0;
+    max-width: 400px;
+    line-height: 1.6;
+  }
+
+  .error-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  /* Buttons */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border: 1px solid;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-primary {
+    background: var(--sl-color-accent);
+    color: var(--sl-color-white);
+    border-color: var(--sl-color-accent);
+  }
+
+  .btn-primary:hover {
+    background: var(--sl-color-accent-high);
+  }
+
+  .btn-secondary {
+    background: var(--sl-color-bg-nav);
+    color: var(--sl-color-text);
+    border-color: var(--sl-color-hairline);
+  }
+
+  .btn-secondary:hover {
+    background: var(--sl-color-bg);
+  }
+
+  .btn-outline {
+    background: transparent;
+    color: var(--sl-color-text);
+    border-color: var(--sl-color-hairline);
+  }
+
+  .btn-outline:hover {
+    background: var(--sl-color-bg-nav);
+  }
+
+  .btn-icon {
+    font-size: 14px;
+  }
+
+  /* Milestones Content */
+  .milestones-content {
+    animation: slideIn 0.4s ease-out;
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(-12px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  .milestones-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  /* Load More Section */
+  .load-more-section {
+    text-align: center;
+    padding: 40px 0;
+  }
+
+  .load-more-btn {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    background: var(--sl-color-bg-nav);
+    border: 1px solid var(--sl-color-hairline);
+    padding: 20px 32px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: var(--sl-color-text);
+  }
+
+  .load-more-btn:hover {
+    background: var(--sl-color-bg);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .load-more-text {
+    font-weight: 500;
+  }
+
+  .load-more-arrow {
+    font-size: 20px;
+    color: var(--sl-color-gray-3);
+    transition: transform 0.2s;
+  }
+
+  .load-more-btn:hover .load-more-arrow {
+    transform: translateY(2px);
+  }
+
+  /* End Section */
+  .end-section {
+    text-align: center;
+    padding: 80px 24px;
+  }
+
+  .end-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+  }
+
+  .end-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--sl-color-white);
+    margin: 0 0 8px 0;
+  }
+
+  .end-text {
+    color: var(--sl-color-gray-3);
+    margin: 0 0 32px 0;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .hero-section {
+      padding: 60px 16px 32px;
+    }
+
+    .hero-title {
+      font-size: 36px;
+    }
+
+    .hero-subtitle {
+      font-size: 16px;
+    }
+
+    .main-section {
+      padding: 24px 16px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .hero-title {
+      font-size: 28px;
+    }
+
+    .error-actions {
+      flex-direction: column;
+      align-items: center;
+    }
+  }
+</style>
+
+<script>
+  interface Milestone {
+    id: number;
+    title: string;
+    description: string;
+    state: 'open' | 'closed';
+    progress: number;
+    total_issues: number;
+    open_issues: number;
+    closed_issues: number;
+    created_at: string;
+    updated_at: string;
+    due_on: string | null;
+    closed_at: string | null;
+    html_url: string;
+    issues: Issue[];
+    categories: Record<string, number>;
+  }
+
+  interface Issue {
+    id: number;
+    number: number;
+    title: string;
+    state: 'open' | 'closed';
+    html_url: string;
+    labels: Array<{
+      name: string;
+      color: string;
+    }>;
+    category: string;
+    priority: string;
+  }
+
+  let currentPage = 1;
+  let hasNextPage = true;
+  let isLoading = false;
+
+  async function loadMilestones(page: number = 1, append: boolean = false): Promise<void> {
+    if (isLoading) return;
+    isLoading = true;
+
+    const loadingEl = document.getElementById('milestones-loading');
+    const contentEl = document.getElementById('milestones-content');
+    const errorEl = document.getElementById('milestones-error');
+    const milestonesListEl = document.getElementById('milestones-list');
+
+    if (!loadingEl || !contentEl || !errorEl || !milestonesListEl) {
+      isLoading = false;
+      return;
+    }
+
+    if (!append) {
+      loadingEl.style.display = 'block';
+      contentEl.style.display = 'none';
+      errorEl.style.display = 'none';
+    }
+
+    try {
+      const params = new URLSearchParams({
+        page: page.toString(),
+        limit: '5',
+        state: 'all'
+      });
+
+      const response = await fetch(`/api/changelog?${params}`);
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      if (!data.success) {
+        throw new Error(data.error || 'Failed to load data');
+      }
+
+      const milestones: Milestone[] = data.data.milestones;
+      const pagination = data.data.pagination;
+
+      if (!milestones || milestones.length === 0) {
+        loadingEl.style.display = 'none';
+        contentEl.style.display = 'block';
+        milestonesListEl.innerHTML = `
+          <div style="text-align: center; padding: 60px 24px; color: var(--sl-color-gray-3);">
+            <div style="font-size: 48px; margin-bottom: 16px;">📋</div>
+            <h3 style="font-size: 18px; font-weight: 600; margin: 0 0 8px 0; color: var(--sl-color-white);">No milestones found</h3>
+            <p style="margin: 0;">Check back later for updates.</p>
+          </div>
+        `;
+        hasNextPage = false;
+        updateLoadMoreButton();
+        return;
+      }
+
+      if (!append) {
+        milestonesListEl.innerHTML = '';
+      }
+
+      // Render milestones with stagger animation
+      milestones.forEach((milestone, index) => {
+        setTimeout(() => {
+          const milestoneEl = createMilestoneElement(milestone);
+          milestoneEl.style.opacity = '0';
+          milestoneEl.style.transform = 'translateY(12px)';
+          milestonesListEl.appendChild(milestoneEl);
+
+          // Trigger animation
+          setTimeout(() => {
+            milestoneEl.style.transition = 'all 0.4s ease-out';
+            milestoneEl.style.opacity = '1';
+            milestoneEl.style.transform = 'translateY(0)';
+          }, 50);
+        }, index * 100);
+      });
+
+      // Update pagination state
+      hasNextPage = pagination.has_next;
+      updateLoadMoreButton();
+
+      // Show content
+      setTimeout(() => {
+        loadingEl.style.display = 'none';
+        contentEl.style.display = 'block';
+      }, 200);
+
+    } catch (error) {
+      console.error('Failed to load milestones:', error);
+
+      if (!append) {
+        loadingEl.style.display = 'none';
+        contentEl.style.display = 'none';
+        errorEl.style.display = 'block';
+      }
+    } finally {
+      isLoading = false;
+    }
+  }
+
+  function createMilestoneElement(milestone: Milestone): HTMLElement {
+    const milestoneEl = document.createElement('div');
+    milestoneEl.className = `milestone-card ${milestone.state}`;
+    milestoneEl.dataset.milestoneId = milestone.id.toString();
+
+    // Apply professional styles directly
+    milestoneEl.style.cssText = `
+      background: var(--sl-color-bg-nav);
+      border: 1px solid var(--sl-color-hairline);
+      border-radius: 12px;
+      padding: 24px;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+      display: block;
+      visibility: visible;
+    `;
+
+    // Add hover effects
+    milestoneEl.addEventListener('mouseenter', () => {
+      milestoneEl.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.07), 0 10px 15px rgba(0, 0, 0, 0.1)';
+      milestoneEl.style.transform = 'translateY(-2px)';
+    });
+
+    milestoneEl.addEventListener('mouseleave', () => {
+      milestoneEl.style.boxShadow = 'none';
+      milestoneEl.style.transform = 'translateY(0)';
+    });
+
+    const formatDate = (dateStr: string | null) => {
+      if (!dateStr) return 'No due date set';
+      return new Date(dateStr).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      });
+    };
+
+    // Sanitize description
+    const sanitizeDescription = (description) => {
+      if (!description) return '';
+
+      // Remove HTML tags
+      let sanitized = description.replace(/<[^>]*>/g, '');
+
+      // Convert markdown headers to plain text
+      sanitized = sanitized.replace(/^#{1,6}\s+/gm, '');
+
+      // Convert markdown bold/italic to plain text
+      sanitized = sanitized.replace(/\*\*([^*]+)\*\*/g, '$1');
+      sanitized = sanitized.replace(/\*([^*]+)\*/g, '$1');
+      sanitized = sanitized.replace(/__([^_]+)__/g, '$1');
+      sanitized = sanitized.replace(/_([^_]+)_/g, '$1');
+
+      // Remove markdown links, keep text
+      sanitized = sanitized.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1');
+
+      // Remove markdown code blocks
+      sanitized = sanitized.replace(/```[\s\S]*?```/g, '');
+      sanitized = sanitized.replace(/`([^`]+)`/g, '$1');
+
+      // Clean up extra whitespace
+      sanitized = sanitized.replace(/\n\s*\n/g, ' ');
+      sanitized = sanitized.trim();
+
+      // Truncate if too long
+      if (sanitized.length > 150) {
+        sanitized = sanitized.substring(0, 147) + '...';
+      }
+
+      return sanitized;
+    };
+
+    const sanitizedDescription = sanitizeDescription(milestone.description);
+
+    milestoneEl.innerHTML = `
+      <!-- Header Section -->
+      <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 20px;">
+        <div style="flex: 1;">
+          <h3 style="color: var(--sl-color-white); margin: 0 0 8px 0; font-size: 20px; font-weight: 600; line-height: 1.2; letter-spacing: -0.025em;">${milestone.title}</h3>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+            ${milestone.state === 'open'
+              ? 'background: rgba(34, 197, 94, 0.1); color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.2);'
+              : 'background: rgba(99, 102, 241, 0.1); color: #6366f1; border: 1px solid rgba(99, 102, 241, 0.2);'
+            }
+          ">${milestone.state}</span>
+        </div>
+      </div>
+
+      <!-- Progress Section -->
+      <div style="
+        background: var(--sl-color-bg);
+        border: 1px solid var(--sl-color-hairline);
+        border-radius: 8px;
+        padding: 16px;
+        margin-bottom: 16px;
+      ">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+          <span style="color: var(--sl-color-white); font-size: 14px; font-weight: 500;">Progress</span>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="color: var(--sl-color-gray-3); font-size: 13px;">${milestone.closed_issues}/${milestone.total_issues}</span>
+            <span style="color: var(--sl-color-white); font-size: 16px; font-weight: 600; font-feature-settings: 'tnum';">${milestone.progress}%</span>
+          </div>
+        </div>
+        <div style="
+          height: 8px;
+          background: var(--sl-color-hairline);
+          border-radius: 4px;
+          overflow: hidden;
+          position: relative;
+        ">
+          <div style="
+            height: 100%;
+            background: ${milestone.progress === 100
+              ? 'linear-gradient(90deg, #22c55e, #16a34a)'
+              : 'linear-gradient(90deg, #3b82f6, #1d4ed8)'
+            };
+            width: ${milestone.progress}%;
+            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 4px;
+          "></div>
+        </div>
+      </div>
+
+      ${sanitizedDescription ? `
+      <!-- Description Section -->
+      <div style="
+        background: var(--sl-color-bg);
+        border: 1px solid var(--sl-color-hairline);
+        border-radius: 8px;
+        padding: 16px;
+        margin-bottom: 16px;
+      ">
+        <p style="
+          color: var(--sl-color-gray-3);
+          font-size: 14px;
+          line-height: 1.6;
+          margin: 0;
+          word-wrap: break-word;
+          overflow-wrap: break-word;
+          white-space: pre-line;
+        ">${sanitizedDescription}</p>
+      </div>
+      ` : ''}
+
+      <!-- Stats Grid -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+        <div style="
+          background: var(--sl-color-bg);
+          border: 1px solid var(--sl-color-hairline);
+          border-radius: 6px;
+          padding: 12px;
+          text-align: center;
+        ">
+          <div style="color: #22c55e; font-size: 18px; font-weight: 700; margin-bottom: 2px;">${milestone.closed_issues}</div>
+          <div style="color: var(--sl-color-gray-3); font-size: 12px; text-transform: uppercase; letter-spacing: 0.025em;">Completed</div>
+        </div>
+        <div style="
+          background: var(--sl-color-bg);
+          border: 1px solid var(--sl-color-hairline);
+          border-radius: 6px;
+          padding: 12px;
+          text-align: center;
+        ">
+          <div style="color: #f59e0b; font-size: 18px; font-weight: 700; margin-bottom: 2px;">${milestone.open_issues}</div>
+          <div style="color: var(--sl-color-gray-3); font-size: 12px; text-transform: uppercase; letter-spacing: 0.025em;">Remaining</div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div style="
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-top: 16px;
+        border-top: 1px solid var(--sl-color-hairline);
+      ">
+        <div style="display: flex; align-items: center; gap: 8px; color: var(--sl-color-gray-3); font-size: 13px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="16" y1="2" x2="16" y2="6"></line>
+            <line x1="8" y1="2" x2="8" y2="6"></line>
+            <line x1="3" y1="10" x2="21" y2="10"></line>
+          </svg>
+          Due ${formatDate(milestone.due_on)}
+        </div>
+        <a href="${milestone.html_url}" target="_blank" style="
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          color: var(--sl-color-gray-3);
+          font-size: 13px;
+          text-decoration: none;
+          transition: color 0.2s;
+        " onmouseover="this.style.color='var(--sl-color-white)'" onmouseout="this.style.color='var(--sl-color-gray-3)'">
+          View on GitHub
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m7 17 10-10"></path>
+            <path d="m17 7-10 0"></path>
+            <path d="m17 7 0 10"></path>
+          </svg>
+        </a>
+      </div>
+    `;
+
+    return milestoneEl;
+  }
+
+  function updateLoadMoreButton(): void {
+    const loadMoreContainer = document.getElementById('load-more-container');
+    const endMessage = document.getElementById('end-message');
+
+    if (!loadMoreContainer || !endMessage) return;
+
+    if (hasNextPage) {
+      loadMoreContainer.style.display = 'block';
+      endMessage.style.display = 'none';
+    } else {
+      loadMoreContainer.style.display = 'none';
+      endMessage.style.display = 'block';
+    }
+  }
+
+  function setupEventListeners(): void {
+    // Load more button
+    const loadMoreBtn = document.getElementById('load-more-btn');
+    if (loadMoreBtn) {
+      loadMoreBtn.addEventListener('click', () => {
+        if (hasNextPage && !isLoading) {
+          currentPage++;
+          loadMilestones(currentPage, true);
+        }
+      });
+    }
+
+    // Retry button
+    const retryBtn = document.getElementById('retry-milestones');
+    if (retryBtn) {
+      retryBtn.addEventListener('click', () => {
+        currentPage = 1;
+        loadMilestones(currentPage, false);
+      });
+    }
+  }
+
+  // Initialize on page load
+  document.addEventListener('DOMContentLoaded', () => {
+    setupEventListeners();
+    setTimeout(() => {
+      loadMilestones(currentPage, false);
+    }, 100);
+  });
+
+  // Fallback initialization if DOMContentLoaded already fired
+  if (document.readyState !== 'loading') {
+    setTimeout(() => {
+      setupEventListeners();
+      loadMilestones(currentPage, false);
+    }, 100);
+  }
+</script>
