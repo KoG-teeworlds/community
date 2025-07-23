@@ -2,7 +2,7 @@
 import { defineConfig } from "astro/config";
 import starlight from "@astrojs/starlight";
 import starlightBlog from "starlight-blog";
-import starlightUtils from "@lorenzo_lewis/starlight-utils";
+
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 
@@ -25,7 +25,9 @@ export default defineConfig({
     starlight({
       title: "KoG Community",
       customCss: ["./src/styles/custom.css"],
-      components: {},
+      components: {
+        SiteTitle: "./src/components/SiteTitle.astro",
+      },
       favicon: "/tee_light.svg",
       logo: {
         dark: "./src/assets/brand/tee_light.svg",
@@ -38,25 +40,6 @@ export default defineConfig({
           label: "Github",
           href: "https://github.com/KoG-teeworlds/community",
         },
-      ],
-      plugins: [
-        starlightBlog({
-          authors: {
-            avolicious: {
-              name: "Avolicious",
-              title: "Project Maintainer",
-              picture: "authors/avolicious.webp",
-              url: "https://kog.tw",
-            },
-          },
-        }),
-        starlightUtils({
-          navLinks: {
-            leading: {
-              useSidebarLabelled: "topNavLinks",
-            },
-          },
-        }),
       ],
       defaultLocale: "root",
       locales: {
@@ -72,10 +55,6 @@ export default defineConfig({
         },
       },
       sidebar: [
-        {
-          label: "topNavLinks",
-          items: [{ label: "Changelog", link: "/changelog/" }],
-        },
         {
           label: "Community",
           translations: {
@@ -116,6 +95,18 @@ export default defineConfig({
           },
           autogenerate: { directory: "agreements" },
         },
+      ],
+      plugins: [
+        starlightBlog({
+          authors: {
+            avolicious: {
+              name: "Avolicious",
+              title: "Project Maintainer",
+              picture: "authors/avolicious.webp",
+              url: "https://kog.tw",
+            },
+          },
+        }),
       ],
     }),
   ],
