@@ -1,158 +1,6 @@
 ---
 const pageTitle = 'KoG Community - Development Changelog';
 const pageDescription = 'Track our development progress through GitHub milestones, issues, and real-time project updates';
-
-interface Milestone {
-  id: number;
-  title: string;
-  description: string;
-  state: "open" | "closed";
-  progress: number;
-  total_issues: number;
-  open_issues: number;
-  closed_issues: number;
-  created_at: string;
-  updated_at: string;
-  due_on: string | null;
-  closed_at: string | null;
-  html_url: string;
-  issues: Issue[];
-  categories: Record<string, number>;
-}
-
-interface Issue {
-  id: number;
-  number: number;
-  title: string;
-  body: string;
-  state: "open" | "closed";
-  created_at: string;
-  updated_at: string;
-  closed_at: string | null;
-  html_url: string;
-  author: {
-    login: string;
-    avatar_url: string;
-  };
-  assignees: Array<{
-    login: string;
-    avatar_url: string;
-  }>;
-  labels: Array<{
-    name: string;
-    color: string;
-    description: string;
-  }>;
-  category: string;
-  priority: string;
-  effort: string;
-}
-
-interface ChangelogData {
-  milestones: Milestone[];
-  pagination: {
-    current_page: number;
-    per_page: number;
-    total_items: number;
-    total_pages: number;
-    has_next: boolean;
-    has_prev: boolean;
-  };
-  stats: {
-    total_milestones: number;
-    open_milestones: number;
-    closed_milestones: number;
-    total_issues: number;
-    open_issues: number;
-    closed_issues: number;
-    categories: Record<string, number>;
-    recent_activity: number;
-  };
-}
-
-// Data will be fetched client-side
-let changelogData: ChangelogData | null = null;
-let error: string | null = null;
-
-const formatDate = (dateStr: string) => {
-  return new Date(dateStr).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  });
-};
-
-const formatRelativeTime = (dateStr: string) => {
-  const date = new Date(dateStr);
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-
-  if (diffDays === 0) return 'Today';
-  if (diffDays === 1) return 'Yesterday';
-  if (diffDays < 7) return `${diffDays} days ago`;
-  if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
-  if (diffDays < 365) return `${Math.floor(diffDays / 30)} months ago`;
-  return `${Math.floor(diffDays / 365)} years ago`;
-};
-
-const getCategoryColor = (category: string) => {
-  const colors = {
-    feature: '#10b981',
-    bugfix: '#f59e0b',
-    performance: '#3b82f6',
-    security: '#ef4444',
-    maintenance: '#8b5cf6',
-    api: '#eab308',
-    documentation: '#06b6d4',
-    other: '#6b7280'
-  };
-  return colors[category as keyof typeof colors] || '#6b7280';
-};
-
-const getPriorityIcon = (priority: string) => {
-  const icons = {
-    critical: '🚨',
-    high: '⚡',
-    medium: '📋',
-    low: '📝'
-  };
-  return icons[priority as keyof typeof icons] || '📝';
-};
-
-const sanitizeDescription = (description: string) => {
-  if (!description) return '';
-
-  // Remove HTML tags
-  let sanitized = description.replace(/<[^>]*>/g, '');
-
-  // Convert markdown headers to plain text
-  sanitized = sanitized.replace(/^#{1,6}\s+/gm, '');
-
-  // Convert markdown bold/italic to plain text
-  sanitized = sanitized.replace(/\*\*([^*]+)\*\*/g, '$1');
-  sanitized = sanitized.replace(/\*([^*]+)\*/g, '$1');
-  sanitized = sanitized.replace(/__([^_]+)__/g, '$1');
-  sanitized = sanitized.replace(/_([^_]+)_/g, '$1');
-
-  // Remove markdown links, keep text
-  sanitized = sanitized.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1');
-
-  // Remove markdown code blocks
-  sanitized = sanitized.replace(/```[\s\S]*?```/g, '');
-  sanitized = sanitized.replace(/`([^`]+)`/g, '$1');
-
-  // Clean up extra whitespace
-  sanitized = sanitized.replace(/\n\s*\n/g, '\n');
-  sanitized = sanitized.trim();
-
-  // Truncate if too long
-  if (sanitized.length > 200) {
-    sanitized = sanitized.substring(0, 197) + '...';
-  }
-
-  return sanitized;
-};
 ---
 
 <!DOCTYPE html>
@@ -1278,27 +1126,83 @@ const sanitizeDescription = (description: string) => {
   </style>
 
   <script>
+    // TypeScript interfaces and types
+    interface Milestone {
+      id: number;
+      title: string;
+      description: string;
+      state: "open" | "closed";
+      progress: number;
+      total_issues: number;
+      open_issues: number;
+      closed_issues: number;
+      created_at: string;
+      updated_at: string;
+      due_on: string | null;
+      closed_at: string | null;
+      html_url: string;
+      issues: Issue[];
+      categories: Record<string, number>;
+    }
+
+    interface Issue {
+      id: number;
+      number: number;
+      title: string;
+      body: string;
+      state: "open" | "closed";
+      created_at: string;
+      updated_at: string;
+      closed_at: string | null;
+      html_url: string;
+      author: {
+        login: string;
+        avatar_url: string;
+      };
+      assignees: Array<{
+        login: string;
+        avatar_url: string;
+      }>;
+      labels: Array<{
+        name: string;
+        color: string;
+        description: string;
+      }>;
+      category: string;
+      priority: string;
+      effort: string;
+    }
+
+    interface Stats {
+      total_milestones: number;
+      open_milestones: number;
+      closed_milestones: number;
+      total_issues: number;
+      open_issues: number;
+      closed_issues: number;
+      categories: Record<string, number>;
+      recent_activity: number;
+    }
+
     const GITHUB_REPO = "KoG-teeworlds/community";
     const GITHUB_API_BASE = "https://api.github.com";
 
-    let changelogData = null;
-    let currentPage = 1;
-    let hasNextPage = false;
-
-    // Initialize the page
+    // Utility functions
     document.addEventListener('DOMContentLoaded', async function() {
       try {
         const milestones = await fetchMilestonesWithIssues();
         renderContent(milestones);
         initializeFilters();
       } catch (error) {
-        showError(error.message);
+        showError((error as Error).message);
       }
     });
 
     // Show error state
-    function showError(message) {
+    function showError(message: string): void {
       const contentSection = document.getElementById('contentSection');
+      if (!contentSection) return;
+
       contentSection.innerHTML = `
         <div class="error-section">
           <div class="container">
@@ -1327,7 +1231,7 @@ const sanitizeDescription = (description: string) => {
     }
 
     // Sanitize description function
-    function sanitizeDescription(description) {
+    function sanitizeDescription(description: string): string {
       if (!description) return '';
 
       let sanitized = description.replace(/<[^>]*>/g, '');
@@ -1350,7 +1254,7 @@ const sanitizeDescription = (description: string) => {
     }
 
     // Format date functions
-    function formatDate(dateStr) {
+    function formatDate(dateStr: string): string {
       return new Date(dateStr).toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'long',
@@ -1358,7 +1262,7 @@ const sanitizeDescription = (description: string) => {
       });
     }
 
-    function formatRelativeTime(dateStr) {
+    function formatRelativeTime(dateStr: string): string {
       const date = new Date(dateStr);
       const now = new Date();
       const diffMs = now.getTime() - date.getTime();
@@ -1372,8 +1276,8 @@ const sanitizeDescription = (description: string) => {
       return `${Math.floor(diffDays / 365)} years ago`;
     }
 
-    function getCategoryColor(category) {
-      const colors = {
+    function getCategoryColor(category: string): string {
+      const colors: Record<string, string> = {
         feature: '#10b981',
         bugfix: '#f59e0b',
         performance: '#3b82f6',
@@ -1387,7 +1291,7 @@ const sanitizeDescription = (description: string) => {
     }
 
     // Fetch from GitHub API
-    async function fetchFromGitHub(endpoint) {
+    async function fetchFromGitHub(endpoint: string): Promise<any> {
       const response = await fetch(`${GITHUB_API_BASE}/repos/${GITHUB_REPO}/${endpoint}`, {
         headers: {
           'Accept': 'application/vnd.github.v3+json',
@@ -1403,32 +1307,32 @@ const sanitizeDescription = (description: string) => {
     }
 
     // Categorize issue
-    function categorizeIssue(issue) {
-      const labels = issue.labels.map(label => label.name.toLowerCase());
+    function categorizeIssue(issue: any): { category: string; priority: string; effort: string } {
+      const labels = issue.labels.map((label: any) => label.name.toLowerCase());
 
       let category = 'other';
-      if (labels.some(l => l.includes('bug') || l.includes('fix'))) category = 'bugfix';
-      else if (labels.some(l => l.includes('feature') || l.includes('enhancement'))) category = 'feature';
-      else if (labels.some(l => l.includes('security'))) category = 'security';
-      else if (labels.some(l => l.includes('performance'))) category = 'performance';
-      else if (labels.some(l => l.includes('api'))) category = 'api';
-      else if (labels.some(l => l.includes('docs') || l.includes('documentation'))) category = 'documentation';
-      else if (labels.some(l => l.includes('maintenance') || l.includes('chore'))) category = 'maintenance';
+      if (labels.some((l: string) => l.includes('bug') || l.includes('fix'))) category = 'bugfix';
+      else if (labels.some((l: string) => l.includes('feature') || l.includes('enhancement'))) category = 'feature';
+      else if (labels.some((l: string) => l.includes('security'))) category = 'security';
+      else if (labels.some((l: string) => l.includes('performance'))) category = 'performance';
+      else if (labels.some((l: string) => l.includes('api'))) category = 'api';
+      else if (labels.some((l: string) => l.includes('docs') || l.includes('documentation'))) category = 'documentation';
+      else if (labels.some((l: string) => l.includes('maintenance') || l.includes('chore'))) category = 'maintenance';
 
       let priority = 'medium';
-      if (labels.some(l => l.includes('critical') || l.includes('urgent'))) priority = 'critical';
-      else if (labels.some(l => l.includes('high'))) priority = 'high';
-      else if (labels.some(l => l.includes('low'))) priority = 'low';
+      if (labels.some((l: string) => l.includes('critical') || l.includes('urgent'))) priority = 'critical';
+      else if (labels.some((l: string) => l.includes('high'))) priority = 'high';
+      else if (labels.some((l: string) => l.includes('low'))) priority = 'low';
 
       let effort = 'medium';
-      if (labels.some(l => l.includes('epic') || l.includes('large'))) effort = 'large';
-      else if (labels.some(l => l.includes('small') || l.includes('quick'))) effort = 'small';
+      if (labels.some((l: string) => l.includes('epic') || l.includes('large'))) effort = 'large';
+      else if (labels.some((l: string) => l.includes('small') || l.includes('quick'))) effort = 'small';
 
       return { category, priority, effort };
     }
 
     // Process issue
-    function processIssue(issue) {
+    function processIssue(issue: any): Issue {
       const { category, priority, effort } = categorizeIssue(issue);
       return {
         id: issue.id,
@@ -1453,7 +1357,7 @@ const sanitizeDescription = (description: string) => {
     }
 
     // Fetch milestones with issues
-    async function fetchMilestonesWithIssues() {
+    async function fetchMilestonesWithIssues(): Promise<Milestone[]> {
       try {
         const [openMilestones, closedMilestones] = await Promise.all([
           fetchFromGitHub("milestones?state=open&sort=due_on&direction=asc"),
@@ -1461,7 +1365,7 @@ const sanitizeDescription = (description: string) => {
         ]);
 
         const allMilestones = [...openMilestones, ...closedMilestones];
-        const processedMilestones = [];
+        const processedMilestones: Milestone[] = [];
 
         for (const milestone of allMilestones.slice(0, 20)) {
           try {
@@ -1471,7 +1375,7 @@ const sanitizeDescription = (description: string) => {
 
             const processedIssues = issues.map(processIssue);
 
-            const categories = processedIssues.reduce((acc, issue) => {
+            const categories = processedIssues.reduce((acc: Record<string, number>, issue: Issue) => {
               acc[issue.category] = (acc[issue.category] || 0) + 1;
               return acc;
             }, {});
@@ -1510,24 +1414,25 @@ const sanitizeDescription = (description: string) => {
     }
 
     // Render content
-    function renderContent(data) {
+    function renderContent(data: Milestone[]): void {
       const contentSection = document.getElementById('contentSection');
+      if (!contentSection) return;
 
       // Calculate stats
-      const stats = {
+      const stats: Stats = {
         total_milestones: data.length,
-        open_milestones: data.filter(m => m.state === 'open').length,
-        closed_milestones: data.filter(m => m.state === 'closed').length,
-        total_issues: data.reduce((sum, m) => sum + m.total_issues, 0),
-        open_issues: data.reduce((sum, m) => sum + m.open_issues, 0),
-        closed_issues: data.reduce((sum, m) => sum + m.closed_issues, 0),
-        categories: data.reduce((acc, milestone) => {
+        open_milestones: data.filter((m: Milestone) => m.state === 'open').length,
+        closed_milestones: data.filter((m: Milestone) => m.state === 'closed').length,
+        total_issues: data.reduce((sum: number, m: Milestone) => sum + m.total_issues, 0),
+        open_issues: data.reduce((sum: number, m: Milestone) => sum + m.open_issues, 0),
+        closed_issues: data.reduce((sum: number, m: Milestone) => sum + m.closed_issues, 0),
+        categories: data.reduce((acc: Record<string, number>, milestone: Milestone) => {
           Object.entries(milestone.categories).forEach(([cat, count]) => {
-            acc[cat] = (acc[cat] || 0) + count;
+            acc[cat] = (acc[cat] || 0) + (count as number);
           });
           return acc;
         }, {}),
-        recent_activity: data.filter(milestone => {
+        recent_activity: data.filter((milestone: Milestone) => {
           const updatedDate = new Date(milestone.updated_at);
           const thirtyDaysAgo = new Date();
           thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
@@ -1536,14 +1441,20 @@ const sanitizeDescription = (description: string) => {
       };
 
       // Update hero stats
-      document.getElementById('totalMilestones').textContent = stats.total_milestones;
-      document.getElementById('totalIssues').textContent = stats.total_issues;
-      document.getElementById('recentActivity').textContent = stats.recent_activity;
-      document.getElementById('completionRate').textContent = Math.round((stats.closed_issues / stats.total_issues) * 100) + '%';
-      document.getElementById('heroStats').style.display = 'block';
+      const totalMilestonesEl = document.getElementById('totalMilestones');
+      const totalIssuesEl = document.getElementById('totalIssues');
+      const recentActivityEl = document.getElementById('recentActivity');
+      const completionRateEl = document.getElementById('completionRate');
+      const heroStatsEl = document.getElementById('heroStats');
+
+      if (totalMilestonesEl) totalMilestonesEl.textContent = stats.total_milestones.toString();
+      if (totalIssuesEl) totalIssuesEl.textContent = stats.total_issues.toString();
+      if (recentActivityEl) recentActivityEl.textContent = stats.recent_activity.toString();
+      if (completionRateEl) completionRateEl.textContent = Math.round((stats.closed_issues / stats.total_issues) * 100) + '%';
+      if (heroStatsEl) heroStatsEl.style.display = 'block';
 
       // Sort milestones
-      data.sort((a, b) => {
+      data.sort((a: Milestone, b: Milestone) => {
         if (a.state !== b.state) {
           return a.state === 'open' ? -1 : 1;
         }
@@ -1591,9 +1502,10 @@ const sanitizeDescription = (description: string) => {
     }
 
     // Render dashboard
-    function renderDashboard(stats, data) {
+    function renderDashboard(stats: Stats, data: Milestone[]): string {
       const completionPercentage = Math.round((stats.closed_issues / stats.total_issues) * 100);
-      const maxCategoryCount = Math.max(...Object.values(stats.categories));
+      const categoryValues = Object.values(stats.categories) as number[];
+      const maxCategoryCount = Math.max(...categoryValues);
 
       return `
         <div class="dashboard-grid">
@@ -1639,7 +1551,7 @@ const sanitizeDescription = (description: string) => {
             <div class="card-content">
               <div class="categories-list">
                 ${Object.entries(stats.categories)
-                  .sort(([,a], [,b]) => b - a)
+                  .sort(([,a], [,b]) => (b as number) - (a as number))
                   .slice(0, 6)
                   .map(([category, count]) => `
                     <div class="category-item">
@@ -1650,7 +1562,7 @@ const sanitizeDescription = (description: string) => {
                       <div class="category-stats">
                         <span class="category-count">${count}</span>
                         <div class="category-bar">
-                          <div class="category-fill" style="width: ${(count / maxCategoryCount) * 100}%; background: ${getCategoryColor(category)}"></div>
+                          <div class="category-fill" style="width: ${((count as number) / maxCategoryCount) * 100}%; background: ${getCategoryColor(category)}"></div>
                         </div>
                       </div>
                     </div>
@@ -1674,7 +1586,7 @@ const sanitizeDescription = (description: string) => {
             </div>
             <div class="card-content">
               <div class="active-milestones">
-                ${data.filter(m => m.state === 'open').slice(0, 3).map(milestone => `
+                ${data.filter((m: Milestone) => m.state === 'open').slice(0, 3).map((milestone: Milestone) => `
                   <div class="milestone-preview">
                     <div class="milestone-header">
                       <h4 class="milestone-name">${milestone.title}</h4>
@@ -1699,8 +1611,8 @@ const sanitizeDescription = (description: string) => {
     }
 
     // Render milestones
-    function renderMilestones(data) {
-      return data.map(milestone => `
+    function renderMilestones(data: Milestone[]): string {
+      return data.map((milestone: Milestone) => `
         <article class="milestone-card" data-state="${milestone.state}">
           <div class="milestone-glow"></div>
           <div class="milestone-header">
@@ -1746,7 +1658,7 @@ const sanitizeDescription = (description: string) => {
             <div class="categories-header">Categories</div>
             <div class="categories-tags">
               ${Object.entries(milestone.categories)
-                .sort(([,a], [,b]) => b - a)
+                .sort(([,a], [,b]) => (b as number) - (a as number))
                 .slice(0, 4)
                 .map(([category, count]) => `
                   <div class="category-tag" style="background: ${getCategoryColor(category)}15; border-color: ${getCategoryColor(category)}40; color: ${getCategoryColor(category)}">
@@ -1776,33 +1688,29 @@ const sanitizeDescription = (description: string) => {
     }
 
     // Initialize filter functionality
-    function initializeFilters() {
+    function initializeFilters(): void {
       const filterTabs = document.querySelectorAll('.filter-tab');
 
-      filterTabs.forEach(tab => {
+      filterTabs.forEach((tab) => {
         tab.addEventListener('click', () => {
           // Update active tab
-          filterTabs.forEach(t => t.classList.remove('active'));
+          filterTabs.forEach((t) => t.classList.remove('active'));
           tab.classList.add('active');
 
           // Filter milestones
-          const filter = tab.dataset.filter;
+          const filter = (tab as HTMLElement).dataset.filter;
           const milestoneCards = document.querySelectorAll('.milestone-card');
 
-          milestoneCards.forEach(card => {
-            if (filter === 'all' || card.dataset.state === filter) {
-              card.style.display = 'block';
+          milestoneCards.forEach((card) => {
+            const htmlCard = card as HTMLElement;
+            if (filter === 'all' || htmlCard.dataset.state === filter) {
+              htmlCard.style.display = 'block';
             } else {
-              card.style.display = 'none';
+              htmlCard.style.display = 'none';
             }
           });
         });
       });
-    }
-
-    // Load more functionality placeholder
-    function loadMoreMilestones() {
-      console.log('Loading more milestones...');
     }
   </script>
 </body>
