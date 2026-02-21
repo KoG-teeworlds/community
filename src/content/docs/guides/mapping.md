@@ -9,7 +9,7 @@ In this guide, we will be breaking down all the mapping rules for KoG. Follow al
 
 ## Gameplay
 
-### 1. The map length must be at least 45 seconds of gameplay for the easy category and 90 seconds for every other category.
+### 1. The map length must be at least 45 seconds of gameplay for the easy and solo categories and 90 seconds for every other category.
 
 We want to offer the players a good amount of gameplay; therefore, your map needs to fulfill the requested map length. Test if your map is long enough by enabling Super and rushing through with full speed.
 
