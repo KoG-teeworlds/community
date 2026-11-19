@@ -1,64 +1,56 @@
-name: Bug Report - Form based (preview)
-description: File a bug report
-title: "[Bug]: "
+name: Bug report
+description: Something on the website, the game servers or a map does not work as it should.
+title: "[Bug] "
 labels: ["bug", "triage"]
-assignees:
-  - octocat
 body:
   - type: markdown
     attributes:
       value: |
-        Thanks for taking the time to fill out this bug report!
-  - type: input
-    id: contact
+        Thanks for telling us. A few lines are enough: what you did, what happened, and where.
+
+        **Not here:** a security problem (see the security policy), and anything about a ban or your account, which we handle privately through a ticket on the website.
+  - type: dropdown
+    id: area
     attributes:
-      label: Contact Details
-      description: How can we get in touch with you if we need more info?
-      placeholder: ex. email@example.com
+      label: Where is the problem?
+      description: Pick the closest one. It decides who looks at the report.
+      options:
+        - Website
+        - Game servers
+        - Maps
+        - Account or login
+        - Discord bot
+        - Something else
     validations:
-      required: false
+      required: true
   - type: textarea
-    id: what-happened
+    id: what
     attributes:
       label: What happened?
-      description: Also tell us, what did you expect to happen?
-      placeholder: Tell us what you see!
-      value: "A bug happened!"
+      description: And what did you expect to happen instead?
     validations:
       required: true
-  - type: dropdown
+  - type: textarea
+    id: steps
+    attributes:
+      label: How can we see it ourselves?
+      description: The steps that lead to the problem, if you know them. A screenshot or a short clip helps a lot.
+      placeholder: |
+        1. Open ...
+        2. Click ...
+        3. ...
+  - type: input
+    id: where
+    attributes:
+      label: Where exactly?
+      description: The address of the page, the name of the server, or the map. Filled in for you when you come from the website.
+  - type: input
+    id: player
+    attributes:
+      label: Your player name
+      description: Only if it helps us look at your case. This page is public.
+  - type: input
     id: version
     attributes:
-      label: Version
-      description: What version of our software are you running?
-      options:
-        - 1.0.0 (Default)
-        - 1.0.1
-        - 1.0.2
-        - 2.0.0
-    validations:
-      required: true
-  - type: dropdown
-    id: browsers
-    attributes:
-      label: What browsers are you seeing the problem on?
-      multiple: true
-      options:
-        - Firefox
-        - Chrome
-        - Safari
-        - Microsoft Edge
-  - type: textarea
-    id: logs
-    attributes:
-      label: Relevant log output
-      description: Please copy and paste any relevant log output. This will be automatically formatted into code.
-      render: shell
-  - type: checkboxes
-    id: terms
-    attributes:
-      label: Code of Conduct
-      description: By submitting this issue, you agree to follow our Code of Conduct
-      options:
-        - label: I agree to follow this project's Code of Conduct
-          required: true
+      label: Website version
+      description: Filled in for you when you come from the website. Leave it empty otherwise.

@@ -1,0 +1,16 @@
+# What people see when they open a new issue: the bug form, plus where everything that is
+# not a bug belongs.
+blank_issues_enabled: true
+contact_links:
+  - name: Questions and help
+    url: https://discord.kog.tw
+    about: Ask the community and the team on Discord.
+  - name: Ideas and proposals
+    url: https://kog.tw/proposals
+    about: Suggest a feature or a change and see where other proposals stand.
+  - name: Bans, appeals and account problems
+    url: https://kog.tw/account/tickets
+    about: These are handled privately, through a ticket on the website.
+  - name: A security problem
+    url: https://github.com/KoG-teeworlds/community/security/policy
+    about: Please report it privately, not as a public issue.
